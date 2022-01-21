@@ -1,29 +1,5 @@
 public class sieveHistogram {
     public static void main(String[] args) {
-        /*The Sieve of Eratosthenes.  A prime number is any integer greater than one that is evenly
-        divisible only by itself and 1.  The Sieve of Eratosthenes is an ancient method of finding prime
-        numbers.  We could apply it using rocks, but we have computers, so we will use them.  The
-        “Sieve” operates as follows:
-
-        1. Create an array of type boolean with all elements initialized to true.  Array elements
-        in Java begin at 0.  The sieve is constructed to ignore element 0 and 1 (those indices are
-        not prime numbers) and to generate an array where any index that is a prime number will
-        contain a value of true in that array position.  All other array elements will eventually
-        be set to false.
-
-        2. Starting with array index 2, look through the remainder of the array and set to false
-        every element whose index is a multiple of two (except 2).  Continue the process with the
-        next element with value true (which will be 3) – set to false array positions at
-        multiples of 3.  For array index 2, all elements beyond element 2 in the array that have
-        indices which are multiples of 2 (4, 6, 8, 10, etc.) will be set to false;  for array index 3,
-        all elements beyond element 3 in the array that have indices which are multiples of 3
-        (indices 6, 9, 12, 15, etc.) will be set to false;  and so on.
-
-        When this process completes, the array elements that are still true indicate that the index is a
-        prime number. */
-
-        //BE PATIENT. This program takes about 4 minutes to run (on my machine).
-
         //declare array of one million booleans
         boolean[] primes = new boolean[1000000];
 
@@ -35,19 +11,11 @@ public class sieveHistogram {
         int index = 2;
         do {
             //set false all elements whose index is a multiple of the current number
-
             for(int i=index+1; i<1000000; i++) {
                 if(i%index == 0) {
                     primes[i] = false;
                 }
             }
-
-
-            /*
-            for(int i=index*2; i<1000000; i += index) {
-                primes[i] = false;
-            }
-            */
 
             //set index to be the next true element
             do {
