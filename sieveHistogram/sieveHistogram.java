@@ -35,11 +35,19 @@ public class sieveHistogram {
         int index = 2;
         do {
             //set false all elements whose index is a multiple of the current number
+
             for(int i=index+1; i<1000000; i++) {
                 if(i%index == 0) {
                     primes[i] = false;
                 }
             }
+
+
+            /*
+            for(int i=index*2; i<1000000; i += index) {
+                primes[i] = false;
+            }
+            */
 
             //set index to be the next true element
             do {
