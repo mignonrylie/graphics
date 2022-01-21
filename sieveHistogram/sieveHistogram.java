@@ -1,6 +1,5 @@
 public class sieveHistogram {
     public static void main(String[] args) {
-        //can you see this change?
         /*The Sieve of Eratosthenes.  A prime number is any integer greater than one that is evenly
         divisible only by itself and 1.  The Sieve of Eratosthenes is an ancient method of finding prime
         numbers.  We could apply it using rocks, but we have computers, so we will use them.  The
