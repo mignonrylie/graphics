@@ -1,16 +1,25 @@
 import javax.swing.*;
 
+//check out of bounds
+
+
+/*
+public class ButtonDriver {
+    public static void main(String args[]) {
+        ButtonObject B = new ButtonObject();
+        B.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+    }
+}
+ */
+
 public class primeCalc {
+
     public static void main(String[] args) {
         JTextArea outputArea = new JTextArea();
-        //outputArea.setText("Hello!");
-
-        //JOptionPane.getRootFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //JOptionPane.showMessageDialog(null, outputArea, "some text", JOptionPane.INFORMATION_MESSAGE);
-        //check out of bounds
         String out = "";
         int num = 0, status = JOptionPane.DEFAULT_OPTION;
+
+
 
         boolean success = true;
         do {
