@@ -1,55 +1,66 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
-//check out of bounds
+public class primeCalc extends JFrame implements ActionListener {
+
+    static JButton button;
+    static JTextField text;
+    static JLabel label;
+
+    primeCalc() {
+        JFrame frame = new JFrame("Prime Number Calculator");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+        label = new JLabel("Enter a number between 0 and 999,999 to see if it's prime.");
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        text = new JTextField(20);
+        text.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        button = new JButton("Calculate");
+        button.addActionListener(this);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        panel.add(Box.createRigidArea(new Dimension(10, 10)));
+        panel.add(label);
+        panel.add(Box.createRigidArea(new Dimension(10, 10)));
+        panel.add(text);
+        panel.add(Box.createRigidArea(new Dimension(10, 10)));
+        panel.add(button);
+        panel.add(Box.createRigidArea(new Dimension(10, 10)));
 
 
-/*
-public class ButtonDriver {
-    public static void main(String args[]) {
-        ButtonObject B = new ButtonObject();
-        B.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+        frame.getContentPane().add(panel);
+        frame.pack();
+        frame.setVisible(true);
     }
-}
- */
 
-public class primeCalc {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(!text.getText().matches("\\d+")) {
+            label.setText("Please input a positive integer!");
+        }
+        else {
+            int num = Integer.parseInt(text.getText());
+            if(num >= 1000000) {
+                label.setText("That number is too large!");
+            }
+            else {
+                if(sieveHistogram.isPrime(num)) {
+                    label.setText(num + " is prime.");
+                }
+                else {
+                    label.setText(num + " is not prime.");
+                }
+            }
+        }
+    }
 
     public static void main(String[] args) {
-        JTextArea outputArea = new JTextArea();
-        String out = "";
-        int num = 0, status = JOptionPane.DEFAULT_OPTION;
-
-
-
-        boolean success = true;
-        do {
-            do {
-                out = JOptionPane.showInputDialog("Enter an integer to see if it's a prime.");
-                if (out != null) {
-                    try {
-                        num = Integer.parseInt(out);
-                        success = true;
-                    } catch (NumberFormatException e) {
-                        outputArea.setText("Please enter an integer!");
-                        JOptionPane.showMessageDialog(null, outputArea, "NumberFormatException", JOptionPane.WARNING_MESSAGE);
-                        success = false;
-                        out = "";
-                    }
-                }
-            } while (!success);
-
-            outputArea.setText(Boolean.toString(sieveHistogram.isPrime(num)));
-            JOptionPane.showMessageDialog(null, outputArea, "Result", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println(status);
-            System.out.println(JOptionPane.CLOSED_OPTION);
-            System.out.println(JOptionPane.DEFAULT_OPTION);
-        } while (status != 1);
-
-        //System.out.println(sieveHistogram.test());
-
-        //System.out.println(sieveHistogram.isPrime(num));
-
-        System.exit(0);
-
+        new primeCalc();
     }
 }
