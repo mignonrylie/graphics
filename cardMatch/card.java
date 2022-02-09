@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class card {
+public class card implements ActionListener {
     public enum suit {
         HEART,
         DIAMOND,
@@ -22,39 +22,39 @@ public class card {
     private ImageIcon face;
     private ImageIcon back;
 
-    private int delay = 3000; //timer length in ms
-    private Timer timer;
+    //private int delay = 3000; //timer length in ms
+    //private Timer timer;
 
     private String defaultFace = "cardIcons/black_joker_icon.png";
     private String defaultBack = "cardIcons/back.png";
 
     //default constructor, in case no image is passed in
     public card() {
-        ActionListener listener = new cardHandler();
+        //ActionListener listener = new cardHandler();
         button = new JButton();
         face = new ImageIcon(defaultFace);
         button.setIcon(face);
-        button.addActionListener(listener);
+        //button.addActionListener(listener);
 
         state = state.FACE;
         back = new ImageIcon(defaultBack);
-        timer = new Timer(delay, listener);
+        //timer = new Timer(delay, listener);
     }
 
     //overloaded constructor, meant to pass in the image
     public card(ImageIcon image) {
-        ActionListener listener = new cardHandler();
+        //ActionListener listener = new cardHandler();
 
         button = new JButton();
         face = image;
 
         back = new ImageIcon(defaultBack);
         button.setIcon(back);
-        button.addActionListener(listener);
+        button.addActionListener(this);
 
         state = state.BACK;
-        timer = new Timer(delay, listener);
-        timer.setRepeats(false);
+        //timer = new Timer(delay, listener);
+        //timer.setRepeats(false);
     }
 
     public int getRank() {
@@ -69,7 +69,7 @@ public class card {
         button.setIcon(image);
     }
 
-    private void flipCard() {
+    public void flipCard() {
         if(state == state.BACK) {
             button.setIcon(face);
             state = state.FACE;
@@ -78,6 +78,12 @@ public class card {
             button.setIcon(back);
             state = state.BACK;
         }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        flipCard();
+        cardMatch.testFunc(this);
     }
 
     /*

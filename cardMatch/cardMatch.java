@@ -12,20 +12,27 @@ public class cardMatch extends JFrame implements ActionListener {
     //private JPanel row4;
     //private int delay = 3000;
     public static boolean cardFlipped = false;
+    private static int delay = 3000; //timer length in ms
+    public static Timer timer;
+
+    private static card cardCalled;
 
     public cardMatch() {
         JFrame frame = new JFrame("card match");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel main = new JPanel();
 
-        //Timer timer = new Timer(delay, this);
-        //timer.start();
+        timer = new Timer(delay, this);
+        timer.setRepeats(false);
 
-        ActionListener listener = new cardHandler();
+        //ActionListener listener = new cardHandler();
 
         ImageIcon image = new ImageIcon("cardIcons/red_joker_icon.png");
         card test = new card();
         card test2 = new card(image);
+
+        //test.addEventListener(this)
+
         main.add(test.button);
         main.add(test2.button);
         frame.add(main);
@@ -33,10 +40,21 @@ public class cardMatch extends JFrame implements ActionListener {
         frame.setVisible(true);
     }
 
+    public static void testFunc(card callingCard) {
+        System.out.println("you called cardMatch!");
+        timer.start();
+        cardCalled = callingCard;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("cardMatch event");
-        System.out.println(cardFlipped);
+        System.out.println("timer went off!");
+        //System.out.println(cardFlipped);
+
+        cardCalled.flipCard();
+
+
+        //if the timer went off, call the
     }
 
     public static void main(String[] args) {
