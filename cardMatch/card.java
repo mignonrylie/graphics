@@ -35,16 +35,16 @@ public class card implements ActionListener {
         face = new ImageIcon(defaultFace);
         button.setIcon(face);
         //button.addActionListener(listener);
-
+        rank = 0;
         state = state.FACE;
         back = new ImageIcon(defaultBack);
         //timer = new Timer(delay, listener);
     }
 
     //overloaded constructor, meant to pass in the image
-    public card(ImageIcon image) {
+    public card(ImageIcon image, int rank) {
         //ActionListener listener = new cardHandler();
-
+        this.rank = rank
         button = new JButton();
         face = image;
 
@@ -83,7 +83,7 @@ public class card implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         flipCard();
-        cardMatch.testFunc(this);
+        cardMatch.cardFlipped(this);
     }
 
     /*
