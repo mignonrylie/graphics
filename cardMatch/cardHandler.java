@@ -23,8 +23,10 @@ public class cardHandler extends JFrame implements ActionListener {
         System.out.println("event handled");
         Object source = e.getSource();
 
+        JButton ref = new JButton(); //why does this work but not javax.swing.JButton
+
         //source.getClass() will tell you what kind of object it is?
-        if(source.getClass() == javax.swing.JButton) {
+        if(source.getClass() == ref.getClass()) {
             System.out.println("button event");
         }
         System.out.println(source);
