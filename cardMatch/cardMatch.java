@@ -2,26 +2,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-//TODO: make reset functional
-//TODO: one "guesses"
-
 public class cardMatch extends JFrame implements ActionListener {
-    //private JFrame frame;
-    //private JPanel main;
-    //private JPanel menu;
     private JPanel row1;
     private JPanel row2;
     private JPanel row3;
     private JPanel row4;
     private JButton reset;
-    //private int delay = 3000;
-    public static boolean cardFlipped = false;
-    private static int delay = 3000; //timer length in ms
-    public static Timer timer;
-    //private static int CARD_COUNT = 52;
 
-    public static int guessesMade = 0; //increments with each card flip
-    public static int matchesMade = 0; //increments with each match
+    private static Timer timer;
+
+    private int LONG_DELAY = 3000; //timer length in ms
+    private static int SHORT_DELAY = 1500;
+    private int CARD_COUNT = 52;
+
+    private static int guessesMade = 0; //increments with each card flip
+    private static int matchesMade = 0; //increments with each match
     private static JLabel guesses;
     private static JLabel matches;
 
@@ -33,8 +28,8 @@ public class cardMatch extends JFrame implements ActionListener {
             "cardIcons/ace_of_hearts_icon.png", "cardIcons/2_of_hearts_icon.png", "cardIcons/3_of_hearts_icon.png", "cardIcons/4_of_hearts_icon.png", "cardIcons/5_of_hearts_icon.png", "cardIcons/6_of_hearts_icon.png", "cardIcons/7_of_hearts_icon.png", "cardIcons/8_of_hearts_icon.png", "cardIcons/9_of_hearts_icon.png", "cardIcons/10_of_hearts_icon.png", "cardIcons/jack_of_hearts_icon.png", "cardIcons/queen_of_hearts_icon.png", "cardIcons/king_of_hearts_icon.png",
             "cardIcons/ace_of_spades_icon.png", "cardIcons/2_of_spades_icon.png", "cardIcons/3_of_spades_icon.png", "cardIcons/4_of_spades_icon.png", "cardIcons/5_of_spades_icon.png", "cardIcons/6_of_spades_icon.png", "cardIcons/7_of_spades_icon.png", "cardIcons/8_of_spades_icon.png", "cardIcons/9_of_spades_icon.png", "cardIcons/10_of_spades_icon.png", "cardIcons/jack_of_spades_icon.png", "cardIcons/queen_of_spades_icon.png", "cardIcons/king_of_spades_icon.png"};
 
-    private card[] orderedCards = new card[52];
-    private card[] cards = new card[52];
+    private card[] orderedCards = new card[CARD_COUNT];
+    private card[] cards = new card[CARD_COUNT];
 
     public cardMatch() {
         JFrame frame = new JFrame("card match");
@@ -59,19 +54,11 @@ public class cardMatch extends JFrame implements ActionListener {
         row3 = new JPanel();
         row4 = new JPanel();
 
-        timer = new Timer(delay, this);
+        timer = new Timer(LONG_DELAY, this);
         timer.setRepeats(false);
 
-        //TODO: change the way cards are added
-        //they should all be initialized first THEN randomized
-        //this is so i can add them in order and therefore initialize their ranks (and suits even tho it doesnt matter)
-        //TODO: card init function
-        //TODO: card randomize
         initCards();
         randomizeCards();
-        for(int i=0; i<cards.length; i++) {
-            System.out.println(cards[i].rank);
-        }
         addToPanel();
 
         main.add(row1);
@@ -87,25 +74,15 @@ public class cardMatch extends JFrame implements ActionListener {
     }
 
     private void initCards() {
-        for(int i=0; i<cards.length; i++) {
+        for(int i = 0; i < cards.length; i++) {
             ImageIcon img = new ImageIcon(filenames[i]);
             //TODO: add rank in constructor call
             orderedCards[i] = new card(img);
-            orderedCards[i].rank = (i%13)+1;
+            orderedCards[i].setRank((i % 13) + 1);
         }
     }
 
     private void randomizeCards() {
-        //array of indices 0-51
-        //randomly pick between 0 and length(array)
-        //add that card to the board
-        //remove that number from the array
-        //repeat
-
-
-        //TODO: change this function to work with preexisting cards
-        //I think this is a pass-by-value issue
-
         cards = orderedCards.clone();
 
         int index = 0;
@@ -120,15 +97,14 @@ public class cardMatch extends JFrame implements ActionListener {
                 cards[j] = temp;
             }
         }
+    }
+
+    private void addToPanel() {
         clearPanel(row1);
         clearPanel(row2);
         clearPanel(row3);
         clearPanel(row4);
 
-
-    }
-
-    private void addToPanel() {
         for (int i = 0; i < cards.length; i++) {
             if (i / 13 == 0) {
                 row1.add(cards[i].button);
@@ -145,71 +121,14 @@ public class cardMatch extends JFrame implements ActionListener {
         }
     }
 
-    /*
-    private void randomizeCards() {
-        //TODO: change this function to work with preexisting cards
-
-        //cards already exist
-        //shuffle the cards
-        //clear the rows and re-add
-
-        String[] randomNames = filenames.clone();
-
-        int index = 0;
-        for(int i=filenames.length; i>=0; i--) {
-            //pick random card
-            index = (int)Math.floor(Math.random()*i);
-
-            //move the random card to the end of the array
-            for(int j=index; j<filenames.length-1; j++) {
-                String temp = randomNames[j+1];
-                randomNames[j+1] = randomNames[j];
-                randomNames[j] = temp;
-            }
-        }
-
-        //System.out.println(cards.length);
-
-        clearPanel(row1);
-        clearPanel(row2);
-        clearPanel(row3);
-        clearPanel(row4);
-
-        for(int i=0; i<cards.length; i++) {
-            //cards[i] = null;
-            ImageIcon img = new ImageIcon(randomNames[i]);
-            cards[i] = new card(img);
-
-            //Component[] components = row1.getComponents();
-
-            if(i/13 == 0) {
-                row1.add(cards[i].button);
-            }
-            if(i/13 == 1) {
-                row2.add(cards[i].button);
-            }
-            if(i/13 == 2) {
-                row3.add(cards[i].button);
-            }
-            if(i/13 == 3) { //redundant but clean
-                row4.add(cards[i].button);
-            }
-        }
-        //repaint();
-    }
-
-     */
-
     private void clearPanel(JPanel panel) {
         if(panel.getComponentCount() != 1) {
-            panel.removeAll(); //.getContentPane maybe
+            panel.removeAll();
         }
         panel.revalidate();
     }
 
     private void resetBoard() {
-
-
         if(click1 != null) {
             click1.flipCard();
             click1 = null;
@@ -219,40 +138,39 @@ public class cardMatch extends JFrame implements ActionListener {
             click2 = null;
         }
 
-        for(int i=0; i<cards.length; i++) {
-            cards[i].resetCard();
-        }
-
-
+        matchesMade = 0;
+        guessesMade = 0;
+        matches.setText(String.valueOf(matchesMade)+" matches");
+        guesses.setText(String.valueOf(guessesMade)+" guesses");
 
         initCards();
         randomizeCards();
-        for(int i=0; i<cards.length; i++) {
-            System.out.println(cards[i].rank);
-        }
+
         clearPanel(row1);
         clearPanel(row2);
         clearPanel(row3);
         clearPanel(row4);
-        repaint();
-        //addToPanel();
+
+        addToPanel();
     }
+
+
 
     //this function is called whenever a button is clicked (ie a card is flipped)
     public static void cardFlipped(card callingCard) {
-        System.out.println("cardFlipped called!");
-        //TODO: whenever the timer expires, set both clicks to null?
-
+        //only process cards that haven't already been matched
         if(!callingCard.matched) {
             //no cards have been clicked yet
             if (click1 == null) {
                 click1 = callingCard;
                 click1.flipCard();
                 guessesMade++;
-                guesses.setText(String.valueOf(guessesMade)+" guesses");
-                timer.start();
-                //set timer, once timer expires
-                //TODO: set timer?
+                if(guessesMade == 1) {
+                    guesses.setText(String.valueOf(guessesMade) + " guess");
+                }
+                else {
+                    guesses.setText(String.valueOf(guessesMade) + " guesses");
+                }
             }
             //one card has already been clicked
             else if (click2 == null) {
@@ -261,75 +179,44 @@ public class cardMatch extends JFrame implements ActionListener {
                 click2.flipCard();
                 //TODO: (guessesmade++)?
                 guessesMade++;
-                guesses.setText(String.valueOf(guessesMade)+" guesses");
+                if(guessesMade == 1) {
+                    guesses.setText(String.valueOf(guessesMade) + " guess");
+                }
+                else {
+                    guesses.setText(String.valueOf(guessesMade) + " guesses");
+                }
+
                 //check if the cards match
-                if (click1.rank == click2.rank) { //they match
+                if (click1.getRank() == click2.getRank()) { //they match
                     matchesMade++;
-                    matches.setText(String.valueOf(matchesMade)+" matches");
+                    if(matchesMade == 1) {
+                        matches.setText(String.valueOf(matchesMade) + " match");
+                    }
+                    else {
+                        matches.setText(String.valueOf(matchesMade) + " matches");
+                    }
+
                     click1.matched = true;
                     click2.matched = true;
                     click1 = null;
                     click2 = null;
                 } else { //they don't match
-                    //TODO: set a quick delay then flip them back
-                    timer.setDelay(500);
+                    //flip the cards back over after a short time
+                    timer.setInitialDelay(SHORT_DELAY);
                     timer.start();
                 }
-
             }
-            //two cards have already been clicked
-            else {
-                //you should do nothing
-            }
-
-
-        /*
-        //if no cards have been clicked no restrictions
-        System.out.println("you called cardMatch!");
-        timer.setDelay(3000);
-        //timer.start();
-        if(cardCalled == null) {
-            cardCalled = callingCard;
-            timer.start();
         }
-
-        //if a card has been clicked, you gotta check:
-        else if(cardCalled != null) {
-            if(cardCalled.rank == callingCard.rank) {
-                //if they're the same rank, DO NOT flip them back over.
-                //TODO: implement lock preventing flip
-                cardCalled.matched = true;
-                callingCard.matched = true;
-            }
-            else {
-                //if they're not the same rank, leave them on screen for a bit then flip them back over
-                //TODO: disable inputs during this time
-                timer.stop();
-                timer.setDelay(1000);
-                timer.start();
-            }
-            //set cardCalled null
-        }
-
-         */
-
-
-        }
-
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        //TODO: check whether source is timer or one of the menu buttons
-
-        //TODO: fix reset???
         if(e.getSource() == reset) {
             resetBoard();
         }
         else if(e.getSource() == timer){
+            timer.setInitialDelay(LONG_DELAY);
 
-            System.out.println("timer went off!");
-            //System.out.println(cardFlipped);
             if(click1 != null) {//possibly redundant
                 click1.flipCard();
                 click1 = null;
@@ -339,7 +226,6 @@ public class cardMatch extends JFrame implements ActionListener {
                 click2 = null;
             }
         }
-        //if the timer went off, call the
     }
 
     public static void main(String[] args) {

@@ -18,7 +18,7 @@ public class card implements ActionListener {
         BACK
     };
 
-    public int rank;
+    private int rank;
     private int suit; //not necessary?
     private state state;
     public JButton button;
@@ -26,67 +26,54 @@ public class card implements ActionListener {
     private ImageIcon back;
     public boolean matched = false;
 
-    //private int delay = 3000; //timer length in ms
-    //private Timer timer;
-
     private String defaultFace = "cardIcons/black_joker_icon.png";
     private String defaultBack = "cardIcons/back.png";
 
     //default constructor, in case no image is passed in
     public card() {
-        //ActionListener listener = new cardHandler();
-        button = new JButton();
         face = new ImageIcon(defaultFace);
-        button.setIcon(face);
-        //button.addActionListener(listener);
-        rank = 0;
-        state = state.FACE;
         back = new ImageIcon(defaultBack);
-        //timer = new Timer(delay, listener);
+
+        button = new JButton();
+        button.setIcon(face);
+        button.addActionListener(this);
+        state = state.FACE;
+
+        rank = 0;
     }
 
     //overloaded constructor, meant to pass in the image
     public card(ImageIcon image) {
-        //ActionListener listener = new cardHandler();
-        rank = 0;
-        button = new JButton();
         face = image;
-
         back = new ImageIcon(defaultBack);
+
+        button = new JButton();
         button.setIcon(back);
         button.addActionListener(this);
-
         state = state.BACK;
-        //timer = new Timer(delay, listener);
-        //timer.setRepeats(false);
+
+        rank = 0;
     }
 
     //overloaded constructor, meant to pass in the image and rank
     public card(ImageIcon image, int rank) {
-        //ActionListener listener = new cardHandler();
-        this.rank = rank;
-        button = new JButton();
         face = image;
-
         back = new ImageIcon(defaultBack);
+
+        button = new JButton();
         button.setIcon(back);
         button.addActionListener(this);
-
         state = state.BACK;
-        //timer = new Timer(delay, listener);
-        //timer.setRepeats(false);
 
-        flipCard();
-    }
-
-    public void resetCard() {
-        matched = false;
-        state = state.BACK;
-        button.setIcon(face);
+        this.rank = rank;
     }
 
     public int getRank() {
         return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     public int getSuit() {
@@ -111,34 +98,7 @@ public class card implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        //if(!matched)
-        //    flipCard();
+        //calls handler function in primary file
         cardMatch.cardFlipped(this);
     }
-
-    /*
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("card event");
-
-        Object source = e.getSource();
-        if(source == button) {
-            System.out.println("button event");
-            timer.start();
-            cardMatch.cardFlipped = true;
-        }
-        else if(source == timer) {
-            System.out.println("timer event");
-            cardMatch.cardFlipped = false;
-        }
-        //if state == BACK
-        //set timer with callback flip card
-        //cancel timer if another card is flipped
-        //call function from cardMatch??? fuck what should go in what class
-        //if(state == BACK) {
-            flipCard();
-
-        //}
-    }
-     */
 }
