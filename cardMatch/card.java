@@ -2,6 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+//TODO: make members private and implement setters & getters
+//TODO: set suits
+
 public class card implements ActionListener {
     public enum suit {
         HEART,
@@ -15,12 +18,13 @@ public class card implements ActionListener {
         BACK
     };
 
-    private int rank;
+    public int rank;
     private int suit; //not necessary?
     private state state;
     public JButton button;
     private ImageIcon face;
     private ImageIcon back;
+    public boolean matched = false;
 
     //private int delay = 3000; //timer length in ms
     //private Timer timer;
@@ -42,9 +46,9 @@ public class card implements ActionListener {
     }
 
     //overloaded constructor, meant to pass in the image
-    public card(ImageIcon image, int rank) {
+    public card(ImageIcon image) {
         //ActionListener listener = new cardHandler();
-        this.rank = rank
+        rank = 0;
         button = new JButton();
         face = image;
 
@@ -55,6 +59,24 @@ public class card implements ActionListener {
         state = state.BACK;
         //timer = new Timer(delay, listener);
         //timer.setRepeats(false);
+    }
+
+    //overloaded constructor, meant to pass in the image and rank
+    public card(ImageIcon image, int rank) {
+        //ActionListener listener = new cardHandler();
+        this.rank = rank;
+        button = new JButton();
+        face = image;
+
+        back = new ImageIcon(defaultBack);
+        button.setIcon(back);
+        button.addActionListener(this);
+
+        state = state.BACK;
+        //timer = new Timer(delay, listener);
+        //timer.setRepeats(false);
+
+        flipCard();
     }
 
     public int getRank() {
@@ -70,19 +92,21 @@ public class card implements ActionListener {
     }
 
     public void flipCard() {
-        if(state == state.BACK) {
-            button.setIcon(face);
-            state = state.FACE;
-        }
-        else if(state == state.FACE) { //this if is redundant
-            button.setIcon(back);
-            state = state.BACK;
+        if(!matched) {
+            if (state == state.BACK) {
+                button.setIcon(face);
+                state = state.FACE;
+            } else if (state == state.FACE) { //this if is redundant
+                button.setIcon(back);
+                state = state.BACK;
+            }
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        flipCard();
+        //if(!matched)
+        //    flipCard();
         cardMatch.cardFlipped(this);
     }
 
