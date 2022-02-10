@@ -79,6 +79,12 @@ public class card implements ActionListener {
         flipCard();
     }
 
+    public void resetCard() {
+        matched = false;
+        state = state.BACK;
+        button.setIcon(face);
+    }
+
     public int getRank() {
         return rank;
     }

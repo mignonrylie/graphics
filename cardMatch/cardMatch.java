@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 //TODO: make reset functional
+//TODO: one "guesses"
 
 public class cardMatch extends JFrame implements ActionListener {
     //private JFrame frame;
@@ -32,6 +33,7 @@ public class cardMatch extends JFrame implements ActionListener {
             "cardIcons/ace_of_hearts_icon.png", "cardIcons/2_of_hearts_icon.png", "cardIcons/3_of_hearts_icon.png", "cardIcons/4_of_hearts_icon.png", "cardIcons/5_of_hearts_icon.png", "cardIcons/6_of_hearts_icon.png", "cardIcons/7_of_hearts_icon.png", "cardIcons/8_of_hearts_icon.png", "cardIcons/9_of_hearts_icon.png", "cardIcons/10_of_hearts_icon.png", "cardIcons/jack_of_hearts_icon.png", "cardIcons/queen_of_hearts_icon.png", "cardIcons/king_of_hearts_icon.png",
             "cardIcons/ace_of_spades_icon.png", "cardIcons/2_of_spades_icon.png", "cardIcons/3_of_spades_icon.png", "cardIcons/4_of_spades_icon.png", "cardIcons/5_of_spades_icon.png", "cardIcons/6_of_spades_icon.png", "cardIcons/7_of_spades_icon.png", "cardIcons/8_of_spades_icon.png", "cardIcons/9_of_spades_icon.png", "cardIcons/10_of_spades_icon.png", "cardIcons/jack_of_spades_icon.png", "cardIcons/queen_of_spades_icon.png", "cardIcons/king_of_spades_icon.png"};
 
+    private card[] orderedCards = new card[52];
     private card[] cards = new card[52];
 
     public cardMatch() {
@@ -44,11 +46,12 @@ public class cardMatch extends JFrame implements ActionListener {
         JPanel menu = new JPanel();
         reset = new JButton("reset");
         reset.addActionListener(this);
-        menu.add(reset);
 
-        guesses = new JLabel(String.valueOf(guessesMade));
-        matches = new JLabel(String.valueOf(matchesMade));
+        guesses = new JLabel(String.valueOf(guessesMade)+" guesses");
+        matches = new JLabel(String.valueOf(matchesMade)+" matches");
+
         menu.add(guesses);
+        menu.add(reset);
         menu.add(matches);
 
         row1 = new JPanel();
@@ -66,6 +69,10 @@ public class cardMatch extends JFrame implements ActionListener {
         //TODO: card randomize
         initCards();
         randomizeCards();
+        for(int i=0; i<cards.length; i++) {
+            System.out.println(cards[i].rank);
+        }
+        addToPanel();
 
         main.add(row1);
         main.add(row2);
@@ -81,94 +88,62 @@ public class cardMatch extends JFrame implements ActionListener {
 
     private void initCards() {
         for(int i=0; i<cards.length; i++) {
-            //cards[i] = null;
             ImageIcon img = new ImageIcon(filenames[i]);
             //TODO: add rank in constructor call
-            cards[i] = new card(img);
-
-            //Component[] components = row1.getComponents();
-            cards[i].rank = (i%13)+1;
-            //i=0 should result in rank=1
-            //i=12 should result in rank=13
-            //i=13 should result in rank=1
-            /*
-            if(i/13 == 0) {
-                row1.add(cards[i].button);
-            }
-            if(i/13 == 1) {
-                row2.add(cards[i].button);
-            }
-            if(i/13 == 2) {
-                row3.add(cards[i].button);
-            }
-            if(i/13 == 3) { //redundant but clean
-                row4.add(cards[i].button);
-            }*/
-
-
+            orderedCards[i] = new card(img);
+            orderedCards[i].rank = (i%13)+1;
         }
-
     }
 
     private void randomizeCards() {
+        //array of indices 0-51
+        //randomly pick between 0 and length(array)
+        //add that card to the board
+        //remove that number from the array
+        //repeat
+
+
         //TODO: change this function to work with preexisting cards
         //I think this is a pass-by-value issue
 
-        //cards already exist
-        //shuffle the cards
-        //clear the rows and re-add
-
-        card[] randomCards = cards.clone();
+        cards = orderedCards.clone();
 
         int index = 0;
-        for (int i = randomCards.length; i >= 0; i--) {
+        for (int i = cards.length; i >= 0; i--) {
             //pick random card
             index = (int) Math.floor(Math.random() * i);
 
             //move the random card to the end of the array
-            for (int j = index; j < randomCards.length - 1; j++) {
-                card temp = randomCards[j + 1];
-                randomCards[j + 1] = randomCards[j];
-                randomCards[j] = temp;
+            for (int j = index; j < cards.length - 1; j++) {
+                card temp = cards[j + 1];
+                cards[j + 1] = cards[j];
+                cards[j] = temp;
             }
         }
-
-        //System.out.println(cards.length);
-
         clearPanel(row1);
         clearPanel(row2);
         clearPanel(row3);
         clearPanel(row4);
 
 
-        for (int i = 0; i < randomCards.length; i++) {
-            //cards[i] = null;
-            //ImageIcon img = new ImageIcon(randomNames[i]);
-            //cards[i] = new card(img);
-
-            //Component[] components = row1.getComponents();
-
-
-            if (i / 13 == 0) {
-                row1.add(randomCards[i].button);
-            }
-            if (i / 13 == 1) {
-                row2.add(randomCards[i].button);
-            }
-            if (i / 13 == 2) {
-                row3.add(randomCards[i].button);
-            }
-
-            if (i / 13 == 3) { //redundant but clean
-                row4.add(randomCards[i].button);
-            }
-        }
-
-        randomCards = null;
     }
 
-        //repaint();
-
+    private void addToPanel() {
+        for (int i = 0; i < cards.length; i++) {
+            if (i / 13 == 0) {
+                row1.add(cards[i].button);
+            }
+            if (i / 13 == 1) {
+                row2.add(cards[i].button);
+            }
+            if (i / 13 == 2) {
+                row3.add(cards[i].button);
+            }
+            if (i / 13 == 3) {
+                row4.add(cards[i].button);
+            }
+        }
+    }
 
     /*
     private void randomizeCards() {
@@ -229,12 +204,11 @@ public class cardMatch extends JFrame implements ActionListener {
         if(panel.getComponentCount() != 1) {
             panel.removeAll(); //.getContentPane maybe
         }
+        panel.revalidate();
     }
 
     private void resetBoard() {
-        for(int i=0; i<cards.length; i++) {
-            cards[i] = null;
-        }
+
 
         if(click1 != null) {
             click1.flipCard();
@@ -245,8 +219,23 @@ public class cardMatch extends JFrame implements ActionListener {
             click2 = null;
         }
 
+        for(int i=0; i<cards.length; i++) {
+            cards[i].resetCard();
+        }
+
+
+
         initCards();
         randomizeCards();
+        for(int i=0; i<cards.length; i++) {
+            System.out.println(cards[i].rank);
+        }
+        clearPanel(row1);
+        clearPanel(row2);
+        clearPanel(row3);
+        clearPanel(row4);
+        repaint();
+        //addToPanel();
     }
 
     //this function is called whenever a button is clicked (ie a card is flipped)
@@ -260,7 +249,7 @@ public class cardMatch extends JFrame implements ActionListener {
                 click1 = callingCard;
                 click1.flipCard();
                 guessesMade++;
-                guesses.setText(String.valueOf(guessesMade));
+                guesses.setText(String.valueOf(guessesMade)+" guesses");
                 timer.start();
                 //set timer, once timer expires
                 //TODO: set timer?
@@ -272,10 +261,11 @@ public class cardMatch extends JFrame implements ActionListener {
                 click2.flipCard();
                 //TODO: (guessesmade++)?
                 guessesMade++;
-                guesses.setText(String.valueOf(guessesMade));
+                guesses.setText(String.valueOf(guessesMade)+" guesses");
                 //check if the cards match
                 if (click1.rank == click2.rank) { //they match
                     matchesMade++;
+                    matches.setText(String.valueOf(matchesMade)+" matches");
                     click1.matched = true;
                     click2.matched = true;
                     click1 = null;
