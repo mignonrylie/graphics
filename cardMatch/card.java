@@ -3,23 +3,14 @@ import java.awt.*;
 import java.awt.event.*;
 
 //TODO: make members private and implement setters & getters
-//TODO: set suits
 
 public class card implements ActionListener {
-    public enum suit {
-        HEART,
-        DIAMOND,
-        CLUB,
-        SPADE
-    };
-
     public enum state {
         FACE,
         BACK
     };
 
     private int rank;
-    private int suit; //not necessary?
     private state state;
     public JButton button;
     private ImageIcon face;
@@ -74,10 +65,6 @@ public class card implements ActionListener {
 
     public void setRank(int rank) {
         this.rank = rank;
-    }
-
-    public int getSuit() {
-        return suit;
     }
 
     public void setImage(ImageIcon image) {
