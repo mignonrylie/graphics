@@ -26,7 +26,7 @@ public class cardMatch extends JFrame implements ActionListener {
     private static String[] filenames = {"cardIcons/ace_of_clubs_icon.png", "cardIcons/2_of_clubs_icon.png", "cardIcons/3_of_clubs_icon.png", "cardIcons/4_of_clubs_icon.png", "cardIcons/5_of_clubs_icon.png", "cardIcons/6_of_clubs_icon.png", "cardIcons/7_of_clubs_icon.png", "cardIcons/8_of_clubs_icon.png", "cardIcons/9_of_clubs_icon.png", "cardIcons/10_of_clubs_icon.png", "cardIcons/jack_of_clubs_icon.png", "cardIcons/queen_of_clubs_icon.png", "cardIcons/king_of_clubs_icon.png",
             "cardIcons/ace_of_diamonds_icon.png", "cardIcons/2_of_diamonds_icon.png", "cardIcons/3_of_diamonds_icon.png", "cardIcons/4_of_diamonds_icon.png", "cardIcons/5_of_diamonds_icon.png", "cardIcons/6_of_diamonds_icon.png", "cardIcons/7_of_diamonds_icon.png", "cardIcons/8_of_diamonds_icon.png", "cardIcons/9_of_diamonds_icon.png", "cardIcons/10_of_diamonds_icon.png", "cardIcons/jack_of_diamonds_icon.png", "cardIcons/queen_of_diamonds_icon.png", "cardIcons/king_of_diamonds_icon.png",
             "cardIcons/ace_of_hearts_icon.png", "cardIcons/2_of_hearts_icon.png", "cardIcons/3_of_hearts_icon.png", "cardIcons/4_of_hearts_icon.png", "cardIcons/5_of_hearts_icon.png", "cardIcons/6_of_hearts_icon.png", "cardIcons/7_of_hearts_icon.png", "cardIcons/8_of_hearts_icon.png", "cardIcons/9_of_hearts_icon.png", "cardIcons/10_of_hearts_icon.png", "cardIcons/jack_of_hearts_icon.png", "cardIcons/queen_of_hearts_icon.png", "cardIcons/king_of_hearts_icon.png",
-            "cardIcons/ace_of_spades_2_icon.png", "cardIcons/2_of_spades_icon.png", "cardIcons/3_of_spades_icon.png", "cardIcons/4_of_spades_icon.png", "cardIcons/5_of_spades_icon.png", "cardIcons/6_of_spades_icon.png", "cardIcons/7_of_spades_icon.png", "cardIcons/8_of_spades_icon.png", "cardIcons/9_of_spades_icon.png", "cardIcons/10_of_spades_icon.png", "cardIcons/jack_of_spades_icon.png", "cardIcons/queen_of_spades_icon.png", "cardIcons/king_of_spades_icon.png"};
+            "cardIcons/ace_of_spades_icon.png", "cardIcons/2_of_spades_icon.png", "cardIcons/3_of_spades_icon.png", "cardIcons/4_of_spades_icon.png", "cardIcons/5_of_spades_icon.png", "cardIcons/6_of_spades_icon.png", "cardIcons/7_of_spades_icon.png", "cardIcons/8_of_spades_icon.png", "cardIcons/9_of_spades_icon.png", "cardIcons/10_of_spades_icon.png", "cardIcons/jack_of_spades_icon.png", "cardIcons/queen_of_spades_icon.png", "cardIcons/king_of_spades_icon.png"};
 
     private card[] orderedCards = new card[CARD_COUNT];
     private card[] cards = new card[CARD_COUNT];
@@ -76,9 +76,7 @@ public class cardMatch extends JFrame implements ActionListener {
     private void initCards() {
         for(int i = 0; i < cards.length; i++) {
             ImageIcon img = new ImageIcon(filenames[i]);
-            //TODO: add rank in constructor call
-            orderedCards[i] = new card(img);
-            orderedCards[i].setRank((i % 13) + 1);
+            orderedCards[i] = new card(img, ((i % 13) + 1));
         }
     }
 
@@ -107,16 +105,16 @@ public class cardMatch extends JFrame implements ActionListener {
 
         for (int i = 0; i < cards.length; i++) {
             if (i / 13 == 0) {
-                row1.add(cards[i].button);
+                row1.add(cards[i].getButton());
             }
             if (i / 13 == 1) {
-                row2.add(cards[i].button);
+                row2.add(cards[i].getButton());
             }
             if (i / 13 == 2) {
-                row3.add(cards[i].button);
+                row3.add(cards[i].getButton());
             }
             if (i / 13 == 3) {
-                row4.add(cards[i].button);
+                row4.add(cards[i].getButton());
             }
         }
     }
@@ -157,7 +155,7 @@ public class cardMatch extends JFrame implements ActionListener {
     //this function is called whenever a button is clicked (ie a card is flipped)
     public static void cardFlipped(card callingCard) {
         //only process cards that haven't already been matched
-        if(!callingCard.matched) {
+        if(!callingCard.getMatched()) {
             //no cards have been clicked yet
             if (click1 == null) {
                 click1 = callingCard;
@@ -172,36 +170,37 @@ public class cardMatch extends JFrame implements ActionListener {
             }
             //one card has already been clicked
             else if (click2 == null) {
-                timer.stop();
-                click2 = callingCard;
-                click2.flipCard();
-                //TODO: (guessesmade++)?
-                guessesMade++;
-                if(guessesMade == 1) {
-                    guesses.setText(String.valueOf(guessesMade) + " guess");
-                }
-                else {
-                    guesses.setText(String.valueOf(guessesMade) + " guesses");
-                }
+                if(click1 != callingCard) {
+                    timer.stop();
+                    click2 = callingCard;
+                    click2.flipCard();
 
-                //check if the cards match
-                if (click1.getRank() == click2.getRank()) { //they match
-                    matchesMade++;
-                    if(matchesMade == 1) {
-                        matches.setText(String.valueOf(matchesMade) + " match");
-                    }
-                    else {
-                        matches.setText(String.valueOf(matchesMade) + " matches");
+                    guessesMade++;
+                    if (guessesMade == 1) {
+                        guesses.setText(String.valueOf(guessesMade) + " guess");
+                    } else {
+                        guesses.setText(String.valueOf(guessesMade) + " guesses");
                     }
 
-                    click1.matched = true;
-                    click2.matched = true;
-                    click1 = null;
-                    click2 = null;
-                } else { //they don't match
-                    //flip the cards back over after a short time
-                    timer.setInitialDelay(SHORT_DELAY);
-                    timer.start();
+                    //check if the cards match
+                    if (click1.getRank() == click2.getRank()) { //they match
+                        matchesMade++;
+                        if (matchesMade == 1) {
+                            matches.setText(String.valueOf(matchesMade) + " match");
+                        } else {
+                            matches.setText(String.valueOf(matchesMade) + " matches");
+                        }
+
+                        click1.setMatched(true);
+                        click2.setMatched(true);
+                        click1 = null;
+                        click2 = null;
+
+                    } else { //they don't match
+                        //flip the cards back over after a short time
+                        timer.setInitialDelay(SHORT_DELAY);
+                        timer.start();
+                    }
                 }
             }
         }

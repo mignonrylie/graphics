@@ -2,8 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-//TODO: make members private and implement setters & getters
-
 public class card implements ActionListener {
     public enum state {
         FACE,
@@ -12,10 +10,10 @@ public class card implements ActionListener {
 
     private int rank;
     private state state;
-    public JButton button;
+    private JButton button;
     private ImageIcon face;
     private ImageIcon back;
-    public boolean matched = false;
+    private boolean matched = false;
 
     private String defaultFace = "cardIcons/black_joker_icon.png";
     private String defaultBack = "cardIcons/back.png";
@@ -69,6 +67,18 @@ public class card implements ActionListener {
 
     public void setImage(ImageIcon image) {
         button.setIcon(image);
+    }
+
+    public JButton getButton() {
+        return button;
+    }
+
+    public boolean getMatched() {
+        return matched;
+    }
+
+    public void setMatched(boolean value) {
+        matched = value;
     }
 
     public void flipCard() {
