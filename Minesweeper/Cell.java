@@ -57,11 +57,15 @@ public class Cell extends JFrame implements MouseListener {
     }
 
     public void setBomb() {
-
+        bomb = true;
     }
 
     public void setNumBombs(int numBombs) {
         this.numBombs = numBombs;
+    }
+
+    public void incBombs() {
+        numBombs++;
     }
 
     public JButton getButton() {
@@ -69,7 +73,17 @@ public class Cell extends JFrame implements MouseListener {
     }
 
     private void reveal() {
-        img = new ImageIcon(files[3]);
+        if(bomb) {
+            //show bomb
+            //game over
+            img = new ImageIcon(files[2]);
+        }
+        else {
+            img = new ImageIcon(files[numBombs+3]);
+        }
+
+
+
         Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
         img = new ImageIcon(scaleimg);
         button.setIcon(img);

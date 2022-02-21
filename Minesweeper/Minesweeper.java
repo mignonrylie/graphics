@@ -19,6 +19,8 @@ public class Minesweeper {
     //quit
     //help
 
+
+
     private enum mode {
         BEGINNER,
         INTERMEDIATE,
@@ -33,9 +35,43 @@ public class Minesweeper {
     private int numCells = rows * cols; //rows * cols
     private int numBombs = 10;
 
+    int[] locations = {i-rows-1, i-rows, i-rows+1, //cells above
+            i-1, i+1, //row of cell
+            i+rows-1, i+rows, i+rows+1};
+
     private Cell[] cells = new Cell[numCells];
+    private int[] bombs = new int[numBombs];
     private Timer timer;
 
+    private boolean containsInt(int[] list, int num) {
+        for(int i=0; i<list.length; i++) {
+            if(list[i] == num) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void countNeighbors(int i) {
+        //int[] locations = new Int[8];
+        //int[] locations = {i-rows-1, i-rows, i-rows+1, //cells above
+        //                i-1, i+1, //row of cell
+        //            i+rows-1, i+rows, i+rows+1}; //cells below
+
+        for(int n : locations) { //for each neighbor
+            if(n >= 0 && n < numCells) { //valid locations only
+                if(containsInt(bombs, n)) { //if that neighbor is a bomb
+                    cells[i].incBombs();
+                }
+            }
+        }
+    }
+
+    private void openTiles() {
+        //opened
+        //toCheck
+
+    }
 
     public Minesweeper() {
         JFrame frame = new JFrame("Minesweeper");
@@ -51,11 +87,13 @@ public class Minesweeper {
         board.setLayout(new GridLayout(rows, cols, hgap, vgap));
 
         Random rand = new Random();
-        int[] bombs = new int[numBombs];
+        bombs = new int[numBombs];
         for(int i = 0; i < numBombs; i++) {
+            int num;
             do {
-                int num = nextInt(numBombs);
-            } while (bombs.contains(num));
+               num = rand.nextInt(numCells);
+               System.out.println(num);
+            } while (containsInt(bombs, num));
 
             bombs[i] = num;
         }
@@ -63,7 +101,13 @@ public class Minesweeper {
         for(int i = 0; i < numCells; i++) {
             cells[i] = new Cell();
             board.add(cells[i].getButton());
-            if()
+            if(containsInt(bombs, i)) {
+                cells[i].setBomb();
+            }
+        }
+        for(int i = 0; i <numCells; i++) {
+            countNeighbors(i); //put for loop inside function?
+
         }
 
 
