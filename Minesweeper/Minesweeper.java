@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
 
 public class Minesweeper {
     //counter for mines
@@ -30,6 +31,7 @@ public class Minesweeper {
     private mode mode;
 
     private int numCells = rows * cols; //rows * cols
+    private int numBombs = 10;
 
     private Cell[] cells = new Cell[numCells];
     private Timer timer;
@@ -48,10 +50,23 @@ public class Minesweeper {
         int vgap = 0;
         board.setLayout(new GridLayout(rows, cols, hgap, vgap));
 
+        Random rand = new Random();
+        int[] bombs = new int[numBombs];
+        for(int i = 0; i < numBombs; i++) {
+            do {
+                int num = nextInt(numBombs);
+            } while (bombs.contains(num));
+
+            bombs[i] = num;
+        }
+
         for(int i = 0; i < numCells; i++) {
             cells[i] = new Cell();
             board.add(cells[i].getButton());
+            if()
         }
+
+
 
         main.add(board);
 

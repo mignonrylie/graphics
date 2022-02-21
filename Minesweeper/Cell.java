@@ -2,7 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Cell extends JFrame implements ActionListener {
+//add question mark flag?
+
+public class Cell extends JFrame implements MouseListener {
     /*
     private enum state { //may not use
         ZERO,
@@ -30,7 +32,7 @@ public class Cell extends JFrame implements ActionListener {
     private int numBombs; //number of bombs in neighboring cells
     private ImageIcon img;
 
-    private int scale = 40;
+    private int scale = 50;
 
 
     //button.setMargin(new Insets(0,0,0,0))
@@ -42,12 +44,20 @@ public class Cell extends JFrame implements ActionListener {
     //left click vs right click
 
     public Cell() {
+        bomb = false;
+        flag = false;
         button = new JButton();
         button.setMargin(new Insets(0, 0, 0, 0));
         img = new ImageIcon(files[0]);
-        img = img.getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
+        Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
+        img = new ImageIcon(scaleimg);
         button.setIcon(img);
-        button.addActionListener(this);
+        //button.addActionListener(this);
+        button.addMouseListener(this);
+    }
+
+    public void setBomb() {
+
     }
 
     public void setNumBombs(int numBombs) {
@@ -60,13 +70,60 @@ public class Cell extends JFrame implements ActionListener {
 
     private void reveal() {
         img = new ImageIcon(files[3]);
-        img = img.getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
+        Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
+        img = new ImageIcon(scaleimg);
         button.setIcon(img);
     }
 
+    private void flag() {
+        System.out.println("Flag");
+        if(flag) {
+            flag = false;
+            img = new ImageIcon(files[0]);
+            Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
+            img = new ImageIcon(scaleimg);
+            button.setIcon(img);
+        }
+        else {
+            flag = true;
+            img = new ImageIcon(files[1]);
+            Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
+            img = new ImageIcon(scaleimg);
+            button.setIcon(img);
+        }
+
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent m) {
+        if(m.getButton() == MouseEvent.BUTTON1) {
+            reveal();
+        }
+        else if(m.getButton() == MouseEvent.BUTTON3) {
+            flag();
+        }
+    }
+
+
+    public void mouseEntered(MouseEvent m) {
+    }
+
+    public void mouseExited(MouseEvent m) {
+    }
+
+    public void mousePressed(MouseEvent m) {
+    }
+
+    public void mouseReleased(MouseEvent m) {
+    }
+
+
+
+    /*
     @Override
     public void actionPerformed(ActionEvent e) {
         reveal();
         System.out.println("button event");
     }
+     */
 }
