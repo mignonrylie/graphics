@@ -35,9 +35,9 @@ public class Minesweeper {
     private int numCells = rows * cols; //rows * cols
     private int numBombs = 10;
 
-    int[] locations = {i-rows-1, i-rows, i-rows+1, //cells above
-            i-1, i+1, //row of cell
-            i+rows-1, i+rows, i+rows+1};
+    //int[] locations = {i-rows-1, i-rows, i-rows+1, //cells above
+    //        i-1, i+1, //row of cell
+    //        i+rows-1, i+rows, i+rows+1};
 
     private Cell[] cells = new Cell[numCells];
     private int[] bombs = new int[numBombs];
@@ -52,6 +52,7 @@ public class Minesweeper {
         return false;
     }
 
+    /*
     private void countNeighbors(int i) {
         //int[] locations = new Int[8];
         //int[] locations = {i-rows-1, i-rows, i-rows+1, //cells above
@@ -66,6 +67,8 @@ public class Minesweeper {
             }
         }
     }
+
+     */
 
     private void openTiles() {
         //opened
@@ -86,6 +89,10 @@ public class Minesweeper {
         int vgap = 0;
         board.setLayout(new GridLayout(rows, cols, hgap, vgap));
 
+
+        //generating bmbs
+        //create numBombs sets of row,col pairs
+        //of course checking that that isn't already a bomb
         Random rand = new Random();
         bombs = new int[numBombs];
         for(int i = 0; i < numBombs; i++) {
@@ -98,19 +105,15 @@ public class Minesweeper {
             bombs[i] = num;
         }
 
-        for(int i = 0; i < numCells; i++) {
-            cells[i] = new Cell();
-            board.add(cells[i].getButton());
-            if(containsInt(bombs, i)) {
-                cells[i].setBomb();
+        Cell[][] newBoard = new Cell[rows][cols];
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                newBoard[i][j] = new Cell();
+                board.add(newBoard[i][j].getButton());
+                //set bombs
             }
-        }
-        for(int i = 0; i <numCells; i++) {
-            countNeighbors(i); //put for loop inside function?
-
-        }
-
-
+        } //set neighbors
 
         main.add(board);
 
