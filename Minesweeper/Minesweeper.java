@@ -312,6 +312,7 @@ public class Minesweeper implements ActionListener{
     private JMenuItem beginner;
     private JMenuItem intermediate;
     private JMenuItem expert;
+    private JMenuItem custom;
     private static JPanel main;
     private static JFrame frame;
 
@@ -427,6 +428,7 @@ public class Minesweeper implements ActionListener{
         //frame.repaint();
     }
 
+
     //initializing things that never need to change,
     //but add them in init()?
     public Minesweeper() {
@@ -452,7 +454,7 @@ public class Minesweeper implements ActionListener{
         jmenu.add(custom);
 
         JMenu game = new JMenu("Game");
-        JMenuItem reset = new JMenuItem("Reset");
+        //JMenuItem reset = new JMenuItem("Reset");
         JMenuItem help = new JMenuItem("Help");
 
 
@@ -550,6 +552,8 @@ public class Minesweeper implements ActionListener{
         System.out.println("main");
     }
 
+    private int availableCells = rows * cols;
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == reset) {
@@ -579,18 +583,26 @@ public class Minesweeper implements ActionListener{
             System.out.println("intermediate");
             //TODO: add intermediate mode
             numBombs = 40;
+            reset();
             init(16, 16);
         }
         else if(e.getSource() == expert) {
             System.out.println("expert");
             //TODO: add expert mode
             numBombs = 99;
+            reset();
             init(20, 24);
         }
         else if(e.getSource() == custom) {
-            JOptionPane optionPane = new JOptionPane;
-            JSlider rowSlider = new JSlider();
+            JOptionPane optionPane = new JOptionPane();
+            JSlider rowSlider = new JSlider(9, 24);
+            JSlider colSlider = new JSlider(9, 30);
+            rowSlider.setValue(16);
+            colSlider.setValue(16);
+            int availableCells =
+            JSlider mines = new JSlider
         }
+        //Custom:  rows [9-30], columns [9-24], and mines from 10% to 25% of available cells for a given setting
 
     }
 }
