@@ -111,6 +111,7 @@ public class Cell extends JFrame implements MouseListener {
             Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
             img = new ImageIcon(scaleimg);
             button.setIcon(img);
+            Minesweeper.numFlagged(-1);
         }
         else {
             flag = true;
@@ -118,6 +119,7 @@ public class Cell extends JFrame implements MouseListener {
             Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
             img = new ImageIcon(scaleimg);
             button.setIcon(img);
+            Minesweeper.numFlagged(1);
         }
 
     }

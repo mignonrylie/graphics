@@ -1,10 +1,11 @@
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
 import java.util.Arrays;
 
-public class Minesweeper implements ActionListener{
+public class Minesweeper implements ActionListener {
     //counter for mines
     //timer for seconds (starts on first click)
 
@@ -339,6 +340,7 @@ public class Minesweeper implements ActionListener{
 
         //main = new JPanel();
 
+        menu.add(flagLabel);
         menu.add(reset);
         menu.add(timeLabel);
         main.add(menu);
@@ -552,7 +554,105 @@ public class Minesweeper implements ActionListener{
         System.out.println("main");
     }
 
+    public static void numFlagged(int num) {
+        flagged += num;
+        flagLabel.setText("Bombs flagged: " + Integer.toString(flagged));
+    }
+
     private int availableCells = rows * cols;
+
+    public static void customPopup() {
+
+        JFrame parent = new JFrame();
+        JPanel panel = new JPanel();
+        /*
+        JOptionPane optionPane = new JOptionPane();
+        JSlider rowSlider = new JSlider(9, 24);
+        JSlider colSlider = new JSlider(9, 30);
+        rowSlider.setValue(16);
+        colSlider.setValue(16);
+
+        Object[] rowMessage = {"Number of rows: ", rowSlider};
+
+        //optionPane.setMessage(new Object[] {"Number of rows: ", rowSlider});
+
+        //int customRows;
+        //int customCols;
+        rowSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int customRows = rowSlider.getValue();
+            }
+        });
+        colSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int customCols = colSlider.getValue();
+            }
+        });
+
+        JOptionPane.setMessage(new Object[] {"Number of rows: ", rowSlider});
+        JDialog dialog = optionPane.createDialog(parent, "Custom");
+        dialog.setVisible(true);
+
+        int availableCells = 0;
+        JSlider mines = new JSlider();
+
+         */
+
+
+
+
+
+
+
+
+
+
+
+
+        JTextField textField = new JTextField();
+
+        final int val = 0;
+
+        ChangeListener listener = new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent event)
+            {
+                // update text field when the slider value changes
+                JSlider source = (JSlider) event.getSource();
+
+                //val = source.getValue();
+                textField.setText("" + source.getValue());
+                System.out.println(source.getValue());
+            }
+        };
+
+        JLabel rowLabel = new JLabel();
+        JLabel colLabel = new JLabel();
+
+        JSlider rowSlider = new JSlider(9, 24);
+        JSlider colSlider = new JSlider(9, 30);
+        rowSlider.setValue(16);
+        colSlider.setValue(16);
+
+        rowSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                int val = source.getValue();
+                rowLabel.setText("Number of rows: " + Integer.toString(val));
+            }
+        });
+        colSlider.addChangeListener(listener);
+
+        panel.add(rowLabel);
+        panel.add(rowSlider);
+        panel.add(colLabel);
+        panel.add(colSlider);
+
+        parent.add(panel);
+        parent.pack();
+        parent.setVisible(true);
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -594,13 +694,9 @@ public class Minesweeper implements ActionListener{
             init(20, 24);
         }
         else if(e.getSource() == custom) {
-            JOptionPane optionPane = new JOptionPane();
-            JSlider rowSlider = new JSlider(9, 24);
-            JSlider colSlider = new JSlider(9, 30);
-            rowSlider.setValue(16);
-            colSlider.setValue(16);
-            int availableCells =
-            JSlider mines = new JSlider
+            System.out.println("custom");
+
+            customPopup();
         }
         //Custom:  rows [9-30], columns [9-24], and mines from 10% to 25% of available cells for a given setting
 
