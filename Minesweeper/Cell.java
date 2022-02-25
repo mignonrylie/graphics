@@ -32,6 +32,9 @@ public class Cell extends JFrame implements MouseListener {
     private int numBombs; //number of bombs in neighboring cells
     private ImageIcon img;
 
+    private int row;
+    private int col;
+
     private int scale = 50;
 
 
@@ -43,7 +46,10 @@ public class Cell extends JFrame implements MouseListener {
     //action handler
     //left click vs right click
 
-    public Cell() {
+    public Cell(int row, int col, int scale) {
+        this.scale = scale;
+        this.row = row;
+        this.col = col;
         bomb = false;
         flag = false;
         button = new JButton();
@@ -60,8 +66,16 @@ public class Cell extends JFrame implements MouseListener {
         bomb = true;
     }
 
+    public boolean getBomb() {
+        return bomb;
+    }
+
     public void setNumBombs(int numBombs) {
         this.numBombs = numBombs;
+    }
+
+    public int getNumBombs() {
+        return numBombs;
     }
 
     public void incBombs() {
@@ -72,7 +86,7 @@ public class Cell extends JFrame implements MouseListener {
         return button;
     }
 
-    private void reveal() {
+    public void reveal() {
         if(bomb) {
             //show bomb
             //game over
@@ -111,7 +125,8 @@ public class Cell extends JFrame implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent m) {
         if(m.getButton() == MouseEvent.BUTTON1) {
-            reveal();
+            //reveal();
+            Minesweeper.openTiles(row, col);
         }
         else if(m.getButton() == MouseEvent.BUTTON3) {
             flag();
