@@ -5,19 +5,7 @@ import java.awt.event.*;
 import java.util.Random;
 import java.util.Arrays;
 
-//as it stands, the game does not account for the user's first click
-//i.e., it is possible to click a bomb on the first try
-//while inconvenient, this does match the vast majority of Minesweeper implementations
 public class Minesweeper implements ActionListener {
-    //menu:
-    //start new game
-    //settings:
-        //grid size
-        //difficulty
-            //Beginner:  9x9 grid (81 cells) with 10 mines
-            //Intermediate:  16x16 grid (256 cells) with 40 mines
-            //Expert:  24x20 grid (480 cells) with 99 mines
-            //Custom:  rows [9-30], columns [9-24], and mines from 10% to 25% of available cells for a given setting
     //quit
     //help
 
@@ -25,22 +13,25 @@ public class Minesweeper implements ActionListener {
     private static int cellSize = 40; //pixel size of icons
     private static int rows = 9;
     private static int cols = 9;
-    private int numCells = rows * cols;
+    private static int numCells = rows * cols;
     private static int numBombs = 10;
     private static int time = 0; //number of seconds elapsed
     private static int flagged = 0; //number of tiles flagged
+    private static int bombsFlagged = 0; //number of bombs flagged (tiles correctly flagged)
+    private static int numOpened = 0;
     private static int userRows = 16; //user-inputted values for custom game mode
     private static int userCols = 16;
     private static int userBombs = 16;
     private static int availableCells = userRows * userCols; //used to calculate possible bombs in custom game mode
     private static boolean gameStart = false; //whether game is running or not
+    public static boolean lock = false; //to prevent user interaction e.g. when game has been won
 
     //game objects
-    private static Cell[][] newBoard = new Cell[rows][cols]; //
+    private static Cell[][] board = new Cell[rows][cols];
     private static int[][] bombs = new int[numBombs][2];
     private static JFrame frame; //window to hold everything
     private static JPanel main; //panel inside window that holds the other panels
-    private static JPanel board; //panel to hold cells
+    private static JPanel gameBoard; //panel to hold cells
     private static JPanel menu; //panel to hold reset button, number flagged, and timer
     private static Timer timer;
     private static JButton reset;
@@ -52,7 +43,7 @@ public class Minesweeper implements ActionListener {
     private JMenuItem expert;
     private JMenuItem custom;
 
-    //includes function for int[] and int
+    //check whether an int[] contains an int
     private boolean containsInt(int[] list, int num) {
         for(int i=0; i<list.length; i++) {
             if(list[i] == num) {
@@ -62,7 +53,7 @@ public class Minesweeper implements ActionListener {
         return false;
     }
 
-    //includes function for int[][] and int[]
+    //check whether an int[][] contains an int[]
     private static boolean containsCoord(int[][] list, int[] coord) {
         boolean equals = false;
         //check each coordinate in list
@@ -80,14 +71,6 @@ public class Minesweeper implements ActionListener {
         }
         return equals;
     }
-
-    /*
-    //likely not used
-    private static int[] getFirst(int[][] arr) {
-        return arr[0];
-    }
-
-     */
 
     //used
     private static int[][] removeFirst(int[][] arr) {
@@ -108,63 +91,68 @@ public class Minesweeper implements ActionListener {
 
     //this function opens tiles, as well as opening any neighboring tiles which have zero bombs.
     public static void openTiles(int rowIn, int colIn) {
+        if(lock) {
+            return;
+        }
 
         if(!gameStart) {
+            //if the first click is a bomb, move it somewhere else
+            if(board[rowIn][colIn].getBomb()) {
+                board[rowIn][colIn].setBomb();
+                int newRow = rowIn;
+                int newCol = colIn;
+                do {
+                    newRow++;
+                    newCol++;
+                }
+                while(board[newRow][newCol].getBomb());
+                board[newRow][newCol].setBomb();
+            }
+
             gameStart = true;
             timer.start();
         }
-        //i'm really not happy with this implementation, but I don't think I fully understand how Array.includes works.
-        //maybe it doesn't
 
-        /*
-        if(bombs[i][j]) {
-            gameOver = 1;
-            clicked[i][j] = 1;
-            return;
-        }
-         */
-        if(newBoard[rowIn][colIn].getBomb()) {
-            //gameOver
+        //end the game if a bomb is clicked
+        if(board[rowIn][colIn].getBomb()) {
             timer.stop();
             timeLabel.setText("Game Over!");
+            lock = true;
 
             //reveal all tiles
             for(int i = 0; i < rows; i++) {
                 for(int j = 0; j < cols; j++) {
-                    newBoard[i][j].reveal();
+                    board[i][j].reveal();
                 }
             }
 
             return;
         }
 
-        //TODO: if all bombs have been flagged, game is won
-        //or if all non-bomb tiles have been opened, game is won
+        //if all bombs have been flagged, game is won
+        if(bombsFlagged == numBombs) {
+            System.out.println(numCells-numOpened);
+            timer.stop();
+            timeLabel.setText("You Won!");
+            lock = true;
+        }
+
+        //if you open a cell that has been erroneously flagged, remove it from the count
+        if(board[rowIn][colIn].getFlag()) {
+            //no need to decrement bombsflagged
+            //if it's being opened, it's not a bomb
+            flagged--;
+        }
 
         //list of all tiles that have already been opened
         int[][] opened = {};
         //list of tiles to check 1)whether it should open 2)for neighbors to open
         int[][] toCheck = {{rowIn, colIn}};
 
-        //safety to avoid infinite loops
-        //TODO: remove this
-        int count = 0;
-
         //procedure:
-
         //if the tile does not contain a number, add all of its neighbors to a list to check.
         //do not add those neighbors if they are already in either list
         while(toCheck.length != 0) {
-            //safety
-            //TODO: remove this
-            if(count > 1000) {
-                System.out.println("possible infinite loop");
-                System.out.println(toCheck);
-                break;
-            }
-            count++;
-
-
             //return/remove first element
             int[] current = toCheck[0];
             toCheck = removeFirst(toCheck);
@@ -174,7 +162,7 @@ public class Minesweeper implements ActionListener {
             int col = current[1];
 
             //we only want to open and check the tiles with no bombs surrounding them
-            if(newBoard[row][col].getNumBombs() == 0) {
+            if(board[row][col].getNumBombs() == 0) {
                 int[][] neighbors = {};
 
                 //check the neighbors: row and col -1 up to row and col +1
@@ -190,22 +178,10 @@ public class Minesweeper implements ActionListener {
                     }
                 }
 
-                /*
-                System.out.println("neighbors are");
-                for(int i = 0; i < neighbors.length; i++) {
-                    for(int j = 0; j < neighbors[i].length; j++) {
-                        System.out.println(neighbors[i][j]);
-                    }
-                }
-                System.out.println(neighbors);
-                */
-
+                //for each neighbor:
                 while(neighbors.length > 0) {
-                    //test = neighbors.pop();
                     int[] test = neighbors[neighbors.length - 1];
                     neighbors = removeLast(neighbors);
-
-
 
                     boolean inToCheck = false;
                     boolean inOpened = false;
@@ -214,64 +190,55 @@ public class Minesweeper implements ActionListener {
                         if(containsCoord(toCheck, test)) {
                             inToCheck = true;
                         }
-                        /*
-                        for(int k=0; k<toCheck.length; k++) {
-                            if(toCheck[k][0] == test[0] && toCheck[k][1] == test[1]) {
-                                inToCheck = true;
-                            }
-                        }
-
-                         */
                     }
 
                     if(containsCoord(opened, test)) {
                         inOpened = true;
                     }
 
-                    /*
-                    for(int k=0; k<opened.length; k++) {
-                        if(opened[k][0] == test[0] && opened[k][1] == test[1]) {
-                            inOpened = true;
-                        }
-                    }
-
-                     */
-
+                    //if we haven't already checked the current neighbor for whether or not it should be opened, check it
                     if(!inToCheck && !inOpened) {
                         toCheck = push(toCheck, test);
                     }
 
                 }
             }
-            //clicked[current[0]][current[1]] = 1;
-            newBoard[row][col].reveal();
+            //open the current cell
+            board[row][col].reveal();
             opened = push(opened, current);
-
         }
 
+        //count the opened tiles
+        numOpened = 0;
+        for(int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (board[i][j].getOpen()) {
+                    numOpened++;
+                }
+            }
+        }
 
+        //if all non-bomb tiles have been opened, game is won
+        if(numCells - numOpened == numBombs) {
+            System.out.println(numCells-numOpened);
+            timer.stop();
+            timeLabel.setText("You Won!");
+            lock = true;
+        }
     }
 
+    //initalize the game; called at first run and whenever parameters are changed
     public static void init(int customRows, int customCols) {
+        /*
         if(main.getComponentCount() > 1){
             main.removeAll();
             main.revalidate();
         }
 
+         */
+
         frame.getContentPane().removeAll();
         frame.invalidate();
-
-        //if anything is in main, clear it
-
-
-
-        //adding reset button to menu
-
-
-
-
-
-        //main = new JPanel();
 
         menu.add(flagLabel);
         menu.add(reset);
@@ -285,18 +252,18 @@ public class Minesweeper implements ActionListener {
         cols = customCols;
 
 
-        board = new JPanel();
+        gameBoard = new JPanel();
         int hgap = 0;
         int vgap = 0;
-        board.setLayout(new GridLayout(rows, cols, hgap, vgap));
+        gameBoard.setLayout(new GridLayout(rows, cols, hgap, vgap));
 
-        newBoard = new Cell[rows][cols];
+        board = new Cell[rows][cols];
 
         for(int i = 0; i < rows; i++) {
             for(int j = 0; j < cols; j++) {
-                newBoard[i][j] = new Cell(i, j, cellSize);
-                //System.out.println(newBoard[i][j]);
-                board.add(newBoard[i][j].getButton());
+                board[i][j] = new Cell(i, j, cellSize);
+                //System.out.println(board[i][j]);
+                gameBoard.add(board[i][j].getButton());
                 //set bombs
             }
         } //set neighbors
@@ -317,12 +284,12 @@ public class Minesweeper implements ActionListener {
                 coord[1] = rand.nextInt(cols);
             } while (containsCoord(bombs, coord));
             bombs[i] = coord;
-            newBoard[coord[0]][coord[1]].setBomb();
+            board[coord[0]][coord[1]].setBomb();
 
             for(int a = -1; a <= 1; a++) {
                 for(int b = -1; b <= 1; b++) {
                     if(a+coord[0] >= 0 && a+coord[0] < rows && b+coord[1] >= 0 && b+coord[1] < cols) {
-                        newBoard[coord[0]+a][coord[1]+b].incBombs();
+                        board[coord[0]+a][coord[1]+b].incBombs();
                     }
                 }
             }
@@ -335,7 +302,7 @@ public class Minesweeper implements ActionListener {
             }
         }
 
-        main.add(board);
+        main.add(gameBoard);
 
 
         frame.add(main);
@@ -348,12 +315,13 @@ public class Minesweeper implements ActionListener {
     }
 
     public static void reset() {
+        lock = false;
         flagged = 0;
-        flagLabel.setText("Bombs flagged: " + Integer.toString(flagged));
+        flagLabel.setText("Bombs left: " + Integer.toString(numBombs - flagged));
 
         timer.stop();
         time = 0;
-        timeLabel.setText(Integer.toString(time));
+        timeLabel.setText("Seconds elapsed: " + Integer.toString(time));
 
         frame.invalidate();
         main.removeAll();
@@ -401,10 +369,10 @@ public class Minesweeper implements ActionListener {
 
         timer = new Timer(1000, this);
         timeLabel = new JLabel();
-        timeLabel.setText(Integer.toString(time));
+        timeLabel.setText("Seconds elapsed: " + Integer.toString(time));
 
         flagLabel = new JLabel();
-        flagLabel.setText("Bombs flagged: " + Integer.toString(flagged));
+        flagLabel.setText("Bombs left: " + Integer.toString(numBombs - flagged));
 
 
         //TODO: clean up, enumerate, use constants?
@@ -418,13 +386,11 @@ public class Minesweeper implements ActionListener {
         Minesweeper m = new Minesweeper();
     }
 
-    public static void numFlagged(int num) {
-        flagged += num;
-        flagLabel.setText("Bombs flagged: " + Integer.toString(flagged));
-        if(flagged == numBombs) {
-            timer.stop();
-            timeLabel.setText("You Won!");
-        }
+    public static void numFlagged(int flag, int bombs) {
+        flagged += flag;
+        flagLabel.setText("Bombs left: " + Integer.toString(numBombs - flagged));
+
+        bombsFlagged += bombs;
     }
 
     private static void customPopup() {
@@ -562,7 +528,7 @@ public class Minesweeper implements ActionListener {
         }
         else if(e.getSource() == timer) {
             time++;
-            timeLabel.setText(Integer.toString(time));
+            timeLabel.setText("Seconds elapsed: " + Integer.toString(time));
         }
         else if(e.getSource() == beginner) {
             numBombs = 10;

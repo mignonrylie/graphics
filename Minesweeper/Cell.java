@@ -52,6 +52,7 @@ public class Cell extends JFrame implements MouseListener {
         this.col = col;
         bomb = false;
         flag = false;
+        open = false;
         button = new JButton();
         button.setMargin(new Insets(0, 0, 0, 0));
         img = new ImageIcon(files[0]);
@@ -63,7 +64,7 @@ public class Cell extends JFrame implements MouseListener {
     }
 
     public void setBomb() {
-        bomb = true;
+        bomb = !bomb;
     }
 
     public boolean getBomb() {
@@ -86,6 +87,14 @@ public class Cell extends JFrame implements MouseListener {
         return button;
     }
 
+    public boolean getFlag() {
+        return flag;
+    }
+
+    public boolean getOpen() {
+        return open;
+    }
+
     public void reveal() {
         if(bomb) {
             img = new ImageIcon(files[2]);
@@ -93,22 +102,28 @@ public class Cell extends JFrame implements MouseListener {
         else {
             img = new ImageIcon(files[numBombs+3]);
         }
-
-
-
+        open = true;
         Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
         img = new ImageIcon(scaleimg);
         button.setIcon(img);
     }
 
     private void flag() {
+        if(Minesweeper.lock) {
+            return;
+        }
         if(flag) {
             flag = false;
             img = new ImageIcon(files[0]);
             Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
             img = new ImageIcon(scaleimg);
             button.setIcon(img);
-            Minesweeper.numFlagged(-1);
+            if(bomb) {
+                Minesweeper.numFlagged(-1, -1);
+            }
+            else {
+                Minesweeper.numFlagged(-1, 0);
+            }
         }
         else {
             flag = true;
@@ -116,7 +131,12 @@ public class Cell extends JFrame implements MouseListener {
             Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
             img = new ImageIcon(scaleimg);
             button.setIcon(img);
-            Minesweeper.numFlagged(1);
+            if(bomb) {
+                Minesweeper.numFlagged(1, 1);
+            }
+            else {
+                Minesweeper.numFlagged(1, 0);
+            }
         }
 
     }
@@ -124,14 +144,12 @@ public class Cell extends JFrame implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent m) {
         if(m.getButton() == MouseEvent.BUTTON1) {
-            //reveal();
             Minesweeper.openTiles(row, col);
         }
         else if(m.getButton() == MouseEvent.BUTTON3) {
             flag();
         }
     }
-
 
     public void mouseEntered(MouseEvent m) {
     }
