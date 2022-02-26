@@ -5,10 +5,10 @@ import java.awt.event.*;
 import java.util.Random;
 import java.util.Arrays;
 
+//as it stands, the game does not account for the user's first click
+//i.e., it is possible to click a bomb on the first try
+//while inconvenient, this does match the vast majority of Minesweeper implementations
 public class Minesweeper implements ActionListener {
-    //counter for mines
-    //timer for seconds (starts on first click)
-
     //menu:
     //start new game
     //settings:
@@ -21,35 +21,36 @@ public class Minesweeper implements ActionListener {
     //quit
     //help
 
-
-
-    private enum mode {
-        BEGINNER,
-        INTERMEDIATE,
-        EXPERT,
-        CUSTOM
-    };
-
+    //game variables
+    private static int cellSize = 40; //pixel size of icons
     private static int rows = 9;
     private static int cols = 9;
-
-    private int numCells = rows * cols; //rows * cols
+    private int numCells = rows * cols;
     private static int numBombs = 10;
+    private static int time = 0; //number of seconds elapsed
+    private static int flagged = 0; //number of tiles flagged
+    private static int userRows = 16; //user-inputted values for custom game mode
+    private static int userCols = 16;
+    private static int userBombs = 16;
+    private static int availableCells = userRows * userCols; //used to calculate possible bombs in custom game mode
+    private static boolean gameStart = false; //whether game is running or not
 
-    //int[] locations = {i-rows-1, i-rows, i-rows+1, //cells above
-    //        i-1, i+1, //row of cell
-    //        i+rows-1, i+rows, i+rows+1};
-
-    private Cell[] cells = new Cell[numCells];
-    private static Cell[][] newBoard = new Cell[rows][cols];
+    //game objects
+    private static Cell[][] newBoard = new Cell[rows][cols]; //
     private static int[][] bombs = new int[numBombs][2];
+    private static JFrame frame; //window to hold everything
+    private static JPanel main; //panel inside window that holds the other panels
+    private static JPanel board; //panel to hold cells
+    private static JPanel menu; //panel to hold reset button, number flagged, and timer
     private static Timer timer;
-    private static int time = 0;
-    private static boolean gameStart = false;
     private static JButton reset;
-    private static JPanel menu;
-
-    private static int cellSize = 40;
+    private static JLabel timeLabel; //holds text for timer
+    private static JLabel flagLabel; //holds text for number flagged
+    private static JButton submit; //submit custom game mode
+    private JMenuItem beginner; //menu items corresponding to the game modes
+    private JMenuItem intermediate;
+    private JMenuItem expert;
+    private JMenuItem custom;
 
     //includes function for int[] and int
     private boolean containsInt(int[] list, int num) {
@@ -80,83 +81,25 @@ public class Minesweeper implements ActionListener {
         return equals;
     }
 
-
-    //TODO: remove or fix this. bombs near the top left are not being counted correctly
-    //not used?
-    private void countNeighbors(int[] coord) {
-        /*
-        int row = coord[0];
-        int col = coord[1];
-        int[][] locations = {
-                {row-1, col-1}, {row-1, col}, {row-1, col+1},
-                {row, col-1}, {row, col+1},
-                {row+1, col-1}, {row+1, col}, {row+1, col+1}
-        };
-
-        int sum = 0;
-        for(int[] check : locations) {
-            if(check[0] >= 0 && check[0] < rows && check[1] >= 0 && check[1] < cols) {
-                //System.out.println(check[0]);
-                //System.out.println(check[1]);
-                //System.out.println(newBoard[0][1]);
-                if(newBoard[check[0]][check[1]].getBomb()) {
-                    sum++;
-                }
-            }
-        }
-        //return sum;
-        newBoard[row][col].setNumBombs(sum);
-        */
-
-
-
-        int sum = 0;
-        for(int i = 0; i < rows; i++) {
-            for(int j = 0; j < cols; j++) {
-                //check each neighbor
-                sum = 0;
-                for(int a = -1; a <= 1; a++) {
-                    for(int b = -1; b <= 1; b++) {
-                        //valid locations only:
-                        //row number cannot be < 0 or > num rows
-                        //col number cannot be < 0 or > num cols
-                        //don't want to check itself, so a&b cannot both be 0
-                        //System.out.println(i+a);
-                        //System.out.println(j+b);
-                        //System.out.println();
-                        if(i+a > 0 && i+a < rows &&
-                                j+b > 0 && j+b < cols &&
-                                !(a == 0 && b == 0)) {
-                            //System.out.println(newBoard.length);
-                            //System.out.println(newBoard[i].length);
-                            //System.out.println(i+a);
-                            //System.out.println(j+b);
-                            //System.out.println(newBoard[i+a][j+b]);
-                            if(newBoard[i+a][j+b].getBomb()) {
-                                sum++;
-                            }
-                        }
-                    }
-                }
-                newBoard[i][j].setNumBombs(sum);
-            }
-        }
-    }
-
-
+    /*
     //likely not used
     private static int[] getFirst(int[][] arr) {
         return arr[0];
     }
 
+     */
+
+    //used
     private static int[][] removeFirst(int[][] arr) {
         return Arrays.copyOfRange(arr, 1, arr.length);
     }
 
+    //used
     private static int[][] removeLast(int[][] arr) {
         return Arrays.copyOfRange(arr, 0, arr.length - 1);
     }
 
+    //used
     private static int[][] push(int[][] arr, int[] val) {
         int[][] toReturn = Arrays.copyOf(arr, arr.length + 1);
         toReturn[arr.length] = val;
@@ -194,6 +137,9 @@ public class Minesweeper implements ActionListener {
 
             return;
         }
+
+        //TODO: if all bombs have been flagged, game is won
+        //or if all non-bomb tiles have been opened, game is won
 
         //list of all tiles that have already been opened
         int[][] opened = {};
@@ -306,19 +252,6 @@ public class Minesweeper implements ActionListener {
 
     }
 
-    private static JLabel timeLabel;
-    private static JLabel flagLabel;
-    private static int flagged = 0;
-
-    private JMenuItem beginner;
-    private JMenuItem intermediate;
-    private JMenuItem expert;
-    private JMenuItem custom;
-    private static JPanel main;
-    private static JFrame frame;
-
-    private static JPanel board;
-
     public static void init(int customRows, int customCols) {
         if(main.getComponentCount() > 1){
             main.removeAll();
@@ -426,19 +359,14 @@ public class Minesweeper implements ActionListener {
         main.removeAll();
         frame.getContentPane().removeAll();
         frame.revalidate();
-        //frame.pack();
-        //frame.repaint();
     }
 
-
-    //initializing things that never need to change,
-    //but add them in init()?
     public Minesweeper() {
         frame = new JFrame("Minesweeper");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //setJMenuBar()
+        frame.setResizable(false);
 
-        frame.setVisible(false);
+        //frame.setVisible(false);
         JMenuBar menuBar = new JMenuBar();
         JMenu jmenu = new JMenu("Difficulty");
 
@@ -477,142 +405,40 @@ public class Minesweeper implements ActionListener {
 
         flagLabel = new JLabel();
         flagLabel.setText("Bombs flagged: " + Integer.toString(flagged));
-        //menu.add(timeLabel);
 
-        //main.add(menu);
 
         //TODO: clean up, enumerate, use constants?
         init(9, 9);
 
-        /*
-        JPanel board = new JPanel();
-        int hgap = 0;
-        int vgap = 0;
-        board.setLayout(new GridLayout(rows, cols, hgap, vgap));
-
-        newBoard = new Cell[rows][cols];
-
-        for(int i = 0; i < rows; i++) {
-            for(int j = 0; j < cols; j++) {
-                newBoard[i][j] = new Cell(i, j);
-                //System.out.println(newBoard[i][j]);
-                board.add(newBoard[i][j].getButton());
-                //set bombs
-            }
-        } //set neighbors
-
-
-
-
-
-        //generating bombs
-        //create numBombs sets of row,col pairs
-        //of course checking that that isn't already a bomb
-        Random rand = new Random();
-        bombs = new int[numBombs][2];
-        for(int i = 0; i < numBombs; i++) {
-            int[] coord = new int[2];
-            do {
-                coord[0] = rand.nextInt(rows);
-                coord[1] = rand.nextInt(cols);
-            } while (containsCoord(bombs, coord));
-            bombs[i] = coord;
-            newBoard[coord[0]][coord[1]].setBomb();
-
-            for(int a = -1; a <= 1; a++) {
-                for(int b = -1; b <= 1; b++) {
-                    if(a+coord[0] >= 0 && a+coord[0] < rows && b+coord[1] >= 0 && b+coord[1] < cols) {
-                        newBoard[coord[0]+a][coord[1]+b].incBombs();
-                    }
-                }
-            }
-        }
-
-        for(int i = 0; i < rows; i++) {
-            for(int j = 0; j < cols; j++) {
-                int[] coord = {i, j};
-                //countNeighbors(coord);
-            }
-        }
-
-        main.add(board);
-        */
-
-        //frame.add(main);
-
-        //frame.revalidate();
-        //frame.repaint();
-        //frame.pack();
-        //frame.revalidate();
-        //frame.repaint();
 
         frame.setVisible(true);
     }
 
     public static void main(String[] args) {
         Minesweeper m = new Minesweeper();
-        System.out.println("main");
     }
 
     public static void numFlagged(int num) {
         flagged += num;
         flagLabel.setText("Bombs flagged: " + Integer.toString(flagged));
+        if(flagged == numBombs) {
+            timer.stop();
+            timeLabel.setText("You Won!");
+        }
     }
 
-    private int availableCells = rows * cols;
-
-    public static void customPopup() {
-
-        JFrame parent = new JFrame();
+    private static void customPopup() {
+        JFrame parent = new JFrame("Custom Game");
         JPanel panel = new JPanel();
-        /*
-        JOptionPane optionPane = new JOptionPane();
-        JSlider rowSlider = new JSlider(9, 24);
-        JSlider colSlider = new JSlider(9, 30);
-        rowSlider.setValue(16);
-        colSlider.setValue(16);
-
-        Object[] rowMessage = {"Number of rows: ", rowSlider};
-
-        //optionPane.setMessage(new Object[] {"Number of rows: ", rowSlider});
-
-        //int customRows;
-        //int customCols;
-        rowSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int customRows = rowSlider.getValue();
-            }
-        });
-        colSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int customCols = colSlider.getValue();
-            }
-        });
-
-        JOptionPane.setMessage(new Object[] {"Number of rows: ", rowSlider});
-        JDialog dialog = optionPane.createDialog(parent, "Custom");
-        dialog.setVisible(true);
-
-        int availableCells = 0;
-        JSlider mines = new JSlider();
-
-         */
 
 
-
-
-
-
-
-
-
-
-
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
         JTextField textField = new JTextField();
 
         final int val = 0;
 
+        /*
         ChangeListener listener = new ChangeListener()
         {
             @Override
@@ -627,78 +453,137 @@ public class Minesweeper implements ActionListener {
             }
         };
 
+         */
+        int minBombs = availableCells/10;
+        int maxBombs = availableCells/4;
+
         JLabel rowLabel = new JLabel();
+        rowLabel.setText("Number of rows: " + userRows);
         JLabel colLabel = new JLabel();
+        colLabel.setText("Number of columns: " + userCols);
+        JLabel bombLabel = new JLabel();
+        bombLabel.setText("Number of bombs: " + userBombs);
 
         JSlider rowSlider = new JSlider(9, 24);
         JSlider colSlider = new JSlider(9, 30);
+        JSlider bombSlider = new JSlider(minBombs, maxBombs);
         rowSlider.setValue(16);
         colSlider.setValue(16);
+        bombSlider.setValue((minBombs+maxBombs)/2);
 
         rowSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 int val = source.getValue();
+                Minesweeper.userRows = val;
                 rowLabel.setText("Number of rows: " + Integer.toString(val));
+                Minesweeper.availableCells = Minesweeper.userRows * Minesweeper.userCols;
+                bombSlider.setMinimum(Minesweeper.availableCells/10);
+                bombSlider.setMaximum(Minesweeper.availableCells/4);
             }
         });
-        colSlider.addChangeListener(listener);
+        //colSlider.addChangeListener(listener);
+        colSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                int usrCols = source.getValue();
+                Minesweeper.userCols = usrCols;
+                colLabel.setText("Number of columns: " + Integer.toString(usrCols));
+                Minesweeper.availableCells = Minesweeper.userRows * Minesweeper.userCols;
+                bombSlider.setMinimum(Minesweeper.availableCells/10);
+                bombSlider.setMaximum(Minesweeper.availableCells/4);
+            }
+        });
+        bombSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                int usrBombs = source.getValue();
+                Minesweeper.userBombs = usrBombs;
+                bombLabel.setText("Number of bombs: " + Integer.toString(usrBombs));
+            }
+        });
 
-        panel.add(rowLabel);
-        panel.add(rowSlider);
-        panel.add(colLabel);
-        panel.add(colSlider);
+        JPanel row = new JPanel();
+        row.add(rowLabel);
+        row.add(rowSlider);
+
+        JPanel col = new JPanel();
+        col.add(colLabel);
+        col.add(colSlider);
+
+        JPanel bombs = new JPanel();
+        bombs.add(bombLabel);
+        bombs.add(bombSlider);
+
+        JPanel submitPanel = new JPanel();
+        submit = new JButton("Create game");
+        //submit.addActionListener(this);
+
+        submit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                reset();
+                init(userRows, userCols);
+
+
+                parent.setVisible(false);
+                parent.dispose();
+            }
+            //parent.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+
+        });
+
+        submitPanel.add(submit);
+
+
+
+        //panel.add(rowLabel);
+        //panel.add(rowSlider);
+        //panel.add(colLabel);
+        //panel.add(colSlider);
+
+        panel.add(row);
+        panel.add(col);
+        panel.add(bombs);
+        panel.add(submitPanel);
 
         parent.add(panel);
         parent.pack();
         parent.setVisible(true);
     }
 
+    //private static void helpPopup()
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == reset) {
-            System.out.println("reset");
-            //TODO: add reset
-            //these commands will probably go into a reset function
             gameStart = false;
             reset();
             init(rows, cols);
         }
         else if(e.getSource() == timer) {
-            System.out.println("tick");
             time++;
             timeLabel.setText(Integer.toString(time));
-
-            menu.repaint();
         }
         else if(e.getSource() == beginner) {
-            System.out.println("beginner");
-            //TODO: add beginner mode
-            //reset and resize
             numBombs = 10;
             reset();
             init(9, 9);
         }
         else if(e.getSource() == intermediate) {
-            System.out.println("intermediate");
-            //TODO: add intermediate mode
             numBombs = 40;
             reset();
             init(16, 16);
         }
         else if(e.getSource() == expert) {
-            System.out.println("expert");
-            //TODO: add expert mode
             numBombs = 99;
             reset();
             init(20, 24);
         }
-        else if(e.getSource() == custom) {
-            System.out.println("custom");
-
+        else if(e.getSource() == custom) { //launch popup window to choose game parameters
             customPopup();
         }
-        //Custom:  rows [9-30], columns [9-24], and mines from 10% to 25% of available cells for a given setting
-
+        else if(e.getSource() == submit) { //activated when user submits parameters; initializes game
+            reset();
+        }
     }
 }

@@ -88,8 +88,6 @@ public class Cell extends JFrame implements MouseListener {
 
     public void reveal() {
         if(bomb) {
-            //show bomb
-            //game over
             img = new ImageIcon(files[2]);
         }
         else {
@@ -104,7 +102,6 @@ public class Cell extends JFrame implements MouseListener {
     }
 
     private void flag() {
-        System.out.println("Flag");
         if(flag) {
             flag = false;
             img = new ImageIcon(files[0]);
