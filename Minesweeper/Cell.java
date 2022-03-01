@@ -2,50 +2,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-//add question mark flag?
-
 public class Cell extends JFrame implements MouseListener {
-    /*
-    private enum state { //may not use
-        ZERO,
-        ONE,
-        TWO,
-        THREE,
-        FOUR,
-        FIVE,
-        SIX,
-        SEVEN,
-        EIGHT
-        DEFAULT, //unopened
-        FLAGGED, //flagged
-    };
-     */
-
+    //cell variables
     private String[] files = {"assets/default.png", "assets/flagged.png", "assets/bomb.png",
             "assets/0.png", "assets/1.png", "assets/2.png", "assets/3.png", "assets/4.png",
             "assets/5.png", "assets/6.png", "assets/7.png", "assets/8.png"};
-
+    private int row;
+    private int col;
+    private int numBombs; //number of bombs in neighboring cells
+    private int scale = 50; //size in pixels of icons
     private boolean bomb;
     private boolean flag;
     private boolean open;
-    private JButton button;
-    private int numBombs; //number of bombs in neighboring cells
     private ImageIcon img;
+    private JButton button;
 
-    private int row;
-    private int col;
-
-    private int scale = 50;
-
-
-    //button.setMargin(new Insets(0,0,0,0))
-
-
-
-
-    //action handler
-    //left click vs right click
-
+    //constructor
     public Cell(int row, int col, int scale) {
         this.scale = scale;
         this.row = row;
@@ -53,13 +25,13 @@ public class Cell extends JFrame implements MouseListener {
         bomb = false;
         flag = false;
         open = false;
+
         button = new JButton();
         button.setMargin(new Insets(0, 0, 0, 0));
         img = new ImageIcon(files[0]);
         Image scaleimg = img.getImage().getScaledInstance(scale, scale, Image.SCALE_DEFAULT);
         img = new ImageIcon(scaleimg);
         button.setIcon(img);
-        //button.addActionListener(this);
         button.addMouseListener(this);
     }
 
@@ -69,10 +41,6 @@ public class Cell extends JFrame implements MouseListener {
 
     public boolean getBomb() {
         return bomb;
-    }
-
-    public void setNumBombs(int numBombs) {
-        this.numBombs = numBombs;
     }
 
     public int getNumBombs() {
@@ -151,6 +119,7 @@ public class Cell extends JFrame implements MouseListener {
         }
     }
 
+    //unused functions required for MouseListener implementation
     public void mouseEntered(MouseEvent m) {
     }
 
@@ -162,14 +131,4 @@ public class Cell extends JFrame implements MouseListener {
 
     public void mouseReleased(MouseEvent m) {
     }
-
-
-
-    /*
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        reveal();
-        System.out.println("button event");
-    }
-     */
 }
