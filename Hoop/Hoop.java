@@ -6,33 +6,39 @@ import javax.swing.event.*;
 public class Hoop {
     private static int panelWidth=800;
     private static int panelHeight=800;
-    //points button: toggles between displaying control points (bouncing balls)
-    //hoop button: toggles display of dancing hoop
-    //speed slider: controls animation speed
-    //make all
     int speed = 10;
-    boolean displayHoop = true;
-    boolean displayPoints = true;
-
-    //AnimCurve2 curve = new AnimCurve2();
+    BouncingBall b;
 
     public Hoop() {
-        BouncingBall b = new BouncingBall();
+        b = new BouncingBall();
+
+        //create window and add animation to it
         JFrame frame = new JFrame("Bouncing Ball");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(panelWidth, panelHeight);
-        //frame.setContentPane(new BouncingBall());
         frame.setContentPane(b);
 
+        //create panel to hold menu objects
         JPanel test = new JPanel();
 
+        //button to toggle displaying points
         JButton points = new JButton("Display points");
         points.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                displayHoop = !displayHoop;
+                //TODO: make private variable w setter method?
+                b.showPoints = !b.showPoints;
             }
         });
+
+        //button to toggle displaying hoop
         JButton hoop = new JButton("Display hoop");
+        hoop.addActionListener(new ActionListener() {
+           public void actionPerformed(ActionEvent e) {
+               b.showHoop = !b.showHoop;
+           }
+        });
+
+        //slider to control animation speed
         JSlider slider = new JSlider(5, 30);
         slider.setInverted(true);
         slider.addChangeListener(new ChangeListener() {
@@ -43,10 +49,14 @@ public class Hoop {
             }
         });
 
+        //label for slider
         JLabel sliderLabel = new JLabel("Animation speed");
-        test.add(button);
+
+        test.add(hoop);
+        test.add(points);
         test.add(sliderLabel);
         test.add(slider);
+
         frame.add(test);
 
         frame.setVisible(true);

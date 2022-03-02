@@ -3,6 +3,12 @@ import javax.swing.*;
 
 //TODO: make each ball a set speed?
 
+//changes to this file:
+//made array of balls instead of single one
+//added Bspline object and commands to paint it
+//added booleans to decide whether or not to render objects
+//added setDelay function
+
 public class BouncingBall extends JPanel {
     int numBalls = 4;
     private Ball[] b = new Ball[numBalls];
@@ -12,43 +18,32 @@ public class BouncingBall extends JPanel {
     private static int panelHeight=800;
 
     Bspline curve = new Bspline();
-
-    //(float)(speed*Math.random()) random speed
+    boolean showHoop = true;
+    boolean showPoints = true;
 
     public BouncingBall() {
         for(int i = 0; i < numBalls; i++) {
-            b[i] = new Ball(panelWidth, panelHeight, //panelWidth+, panelHeight+
+            //initialize point with boundaries = screen size, random speed, and color black
+            b[i] = new Ball(panelWidth, panelHeight,
                     (float)(speed*Math.random()),
                     (float)(speed*Math.random()),
-                    new Color((float)Math.random(), (float)Math.random(), (float)Math.random()));
-
-            //curve.addPoint(b[i].getX(), b[i].getY());
+                    new Color(0, 0, 0));
+            //randomly place point on screen
+            b[i].setX((int)(panelWidth*Math.random()));
+            b[i].setY((int)(panelHeight*Math.random()));
         }
-
-        // Set up the bouncing ball with random speeds and colors
-    /*b = new Ball(panelWidth,panelHeight,
-                (float)(speed*Math.random()), 
-                (float)(speed*Math.random()), 
-        new Color((float)Math.random(), (float)Math.random(), (float)Math.random()));
-
-     */
 
         // Create a thread to update the animation and repaint
         Thread thread = new Thread() {
             public void run() {
                 while (true) {
                     curve.resetCurve();
-                    // Ask the ball to move itself and then repaint
+                    //move each point then generate the corresponding curve
                     for(int i = 0; i < numBalls; i++) {
                         b[i].moveBall();
-
                         curve.addPoint(b[i].getX(), b[i].getY());
                     }
 
-
-
-
-                    //b.moveBall();
                     repaint();
                     getToolkit().sync(); //had to add because of stutter
                     try {
@@ -66,24 +61,18 @@ public class BouncingBall extends JPanel {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Draw the ball
-        for(int i = 0; i < numBalls; i++) {
-            b[i].paintBall(g);
+        //only draw the points if toggled
+        if(showPoints) {
+            for(int i = 0; i < numBalls; i++) {
+                b[i].paintBall(g);
+            }
         }
-        curve.paintCurve(g);
-        //curve.drawPolyline(g);
-        repaint();
-        //b.paintBall(g);
-    }
-  /*
-  public static void main(String[] args) {
-    JFrame.setDefaultLookAndFeelDecorated(true);
-    JFrame frame = new JFrame("Bouncing Ball");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(panelWidth, panelHeight);
-    frame.setContentPane(new BouncingBall());
-    frame.setVisible(true);
-  }
 
-   */
+        //only paint the curve if toggled
+        if(showHoop) {
+            curve.paintCurve(g);
+        }
+
+        repaint();
+    }
 }

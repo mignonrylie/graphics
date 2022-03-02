@@ -2,6 +2,10 @@
 import java.awt.*;
 import javax.swing.*;
 
+//this file was left mostly as-is
+//with the addition of setX/Y functions
+//and setting each ball to black
+
 public class Ball {
     // Box height and width
     private int width;
@@ -27,7 +31,7 @@ public class Ball {
     public Ball(int w, int h) {
         this.width = w;
         this.height = h;
-        this.ballColor = Color.BLUE;
+        this.ballColor = Color.BLACK;
     }
 
     // Constructor to set custom speed and color
@@ -78,6 +82,14 @@ public class Ball {
 
     public int getY () {
         return (int)Y;
+    }
+
+    public void setX(int x) {
+        this.X = x;
+    }
+
+    public void setY(int y) {
+        this.Y = y;
     }
 
     public Color getColor () {

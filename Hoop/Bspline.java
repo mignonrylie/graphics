@@ -1,5 +1,9 @@
 import java.awt.*;
 
+//this file was left as-is except for
+//the addition of different colors for each section
+//and the removal of an unused function
+
 public class Bspline {
 
     private int xpoints[], ypoints[];
@@ -29,27 +33,17 @@ public class Bspline {
         if (count < limit)
             return;
 
+        //one color for each segment
+        Color[] colors = {new Color(255, 0, 238), new Color(0, 102, 255), new Color(162, 0, 255), new Color(0, 229, 255)};
 
         for (int segment=0; segment<limit; segment++) {
             for (int count=0,i=segment; count<limit; count++,i=(i+1)%limit) {
                 xp[count] = xpoints[i];
                 yp[count] = ypoints[i];
             }
-            paintCurveSegment (g, xp, yp );
+            //set each segment to the corresponding color
+            paintCurveSegment (g, xp, yp, colors[segment]);
         }
-    }
-
-    public void drawPolyline ( Graphics g ) {
-        Graphics2D picture = (Graphics2D)g;
-        picture.setStroke(new BasicStroke(3));
-        picture.setColor (Color.RED);
-        for (int i = 0; i < (count-1); i++) {
-            picture.fillOval (xpoints[i]-(width/2), ypoints[i]-(height/2),
-                    width, height);
-            picture.drawLine (xpoints[i], ypoints[i], xpoints[i+1], ypoints[i+1]);
-        }
-        picture.fillOval (xpoints[count-1]-(width/2),
-                ypoints[count-1]-(height/2), width, height);
     }
 
     public void addPoint (int x, int y)
@@ -71,7 +65,7 @@ public class Bspline {
         intervals = i;
     }
 
-    public void paintCurveSegment ( Graphics g, int[]xp, int[]yp ) {
+    public void paintCurveSegment ( Graphics g, int[]xp, int[]yp, Color paintColor) {
         double x, y, xold, yold, A, B, C;
         double t1, t2, t3;
         double deltax1, deltax2, deltax3;
@@ -113,7 +107,8 @@ public class Bspline {
 
         Graphics2D picture = (Graphics2D)g;
         picture.setStroke(new BasicStroke(3));
-        picture.setColor (Color.RED);
+        picture.setColor (paintColor);
+
 
         for (int i = 0; i < intervals; i++) {
             x += deltax1;
