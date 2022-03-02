@@ -25,7 +25,6 @@ public class Hoop {
         JButton points = new JButton("Display points");
         points.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //TODO: make private variable w setter method?
                 b.showPoints = !b.showPoints;
             }
         });

@@ -1,8 +1,6 @@
 import java.awt.*;
 import javax.swing.*;
 
-//TODO: make each ball a set speed?
-
 //changes to this file:
 //made array of balls instead of single one
 //added Bspline object and commands to paint it
