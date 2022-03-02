@@ -119,7 +119,8 @@ public class DancingLoop extends JFrame
         public void paint(Graphics g)
         {
             /* we always want the curve */
-            curve.paintCurve(g);
+            //curve.paintCurve(g);
+            curve.drawPolyline(g);
 
             /* unless animating, we want the control structure too */
             if (!animating) {

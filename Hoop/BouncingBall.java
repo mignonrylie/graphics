@@ -13,12 +13,16 @@ public class BouncingBall extends JPanel {
 
     Bspline curve = new Bspline();
 
+    //(float)(speed*Math.random()) random speed
+
     public BouncingBall() {
         for(int i = 0; i < numBalls; i++) {
-            b[i] = new Ball(panelWidth,panelHeight,
+            b[i] = new Ball(panelWidth, panelHeight, //panelWidth+, panelHeight+
                     (float)(speed*Math.random()),
                     (float)(speed*Math.random()),
                     new Color((float)Math.random(), (float)Math.random(), (float)Math.random()));
+
+            //curve.addPoint(b[i].getX(), b[i].getY());
         }
 
         // Set up the bouncing ball with random speeds and colors
@@ -56,6 +60,10 @@ public class BouncingBall extends JPanel {
         thread.start();
     }
 
+    public void setDelay(int d) {
+        this.delay = d;
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         // Draw the ball
@@ -63,6 +71,8 @@ public class BouncingBall extends JPanel {
             b[i].paintBall(g);
         }
         curve.paintCurve(g);
+        //curve.drawPolyline(g);
+        repaint();
         //b.paintBall(g);
     }
   /*
