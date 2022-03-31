@@ -298,12 +298,12 @@ public class ImageRotate extends JFrame {
         JPanel controlPanel = new JPanel();
         GridLayout grid = new GridLayout (1, 5);
         controlPanel.setLayout(grid);
-        controlPanel.add(infoLabel);
-        controlPanel.add(OriginalButton);
-        controlPanel.add(SharpenButton);
-        controlPanel.add(BlurButton);
-        controlPanel.add(EdgeButton);
-        controlPanel.add(CustomButton);
+        //controlPanel.add(infoLabel);
+        //controlPanel.add(OriginalButton);
+        //controlPanel.add(SharpenButton);
+        //controlPanel.add(BlurButton);
+        //controlPanel.add(EdgeButton);
+        //controlPanel.add(CustomButton);
         //controlPanel.add(rotleft);
         //controlPanel.add(rotright);
         controlPanel.add(reset);
@@ -328,8 +328,8 @@ public class ImageRotate extends JFrame {
         Container c = this.getContentPane();
         c.add(view, BorderLayout.EAST);
         c.add(controlPanel, BorderLayout.SOUTH);
-        c.add(thresholdcontrolPanel, BorderLayout.WEST);
-        c.add(filterPanel, BorderLayout.NORTH);
+        //c.add(thresholdcontrolPanel, BorderLayout.WEST);
+        //c.add(filterPanel, BorderLayout.NORTH);
 
     }
 
