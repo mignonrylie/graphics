@@ -12,7 +12,7 @@ public class Jmorph extends JFrame{
     final static int MIN_TWEEN = 1;
     final static int MAX_TWEEN = 60;
 
-    private HandlePanel h;
+    private HandlePanelHandler h;
 
 
     //static JFrame frame;
@@ -74,7 +74,6 @@ public class Jmorph extends JFrame{
                 }
         );
 
-        h = new HandlePanel(imagePanel1, imagePanel2);
 
 
         //add mouse listeners to detect when trying to click point
@@ -92,26 +91,13 @@ public class Jmorph extends JFrame{
         //frame.add(controlPanel);
         //add(controlPanel);
 
-        h.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                h.clickHandle(e.getX(), e.getY());
-            }
-            public void mouseReleased(MouseEvent e) {
-                h.mouseDone();
-            }
-        });
-
-        h.addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseDragged(MouseEvent e) {
-                h.moveHandle(e.getX(), e.getY());
-            }
-        });
 
 
-        imagePanel1.add(h);
-        imagePanel2.add(h);
+        h = new HandlePanelHandler();
 
-        System.out.println(h.uhhh());
+        imagePanel1.add(h.getChild(1));
+        imagePanel2.add(h.getChild(2));
+
 
         holder.add(imagePanel1, BorderLayout.LINE_START);
         holder.add(test, BorderLayout.CENTER);
