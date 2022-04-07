@@ -8,9 +8,17 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.imageio.*;
 
-public class HandlePanelHandler {
+public class HandlePanelHandler extends JPanel{
+
+    final int HANDLE_SIZE = 10;
+    final int FULL_PANEL_SIZE = 550;
+
     HandlePanel h1;
     HandlePanel h2;
+
+    int tweens = 30;
+
+    Rectangle[] morphHandles;
 
     public HandlePanelHandler() {
         h1 = new HandlePanel();
@@ -18,6 +26,39 @@ public class HandlePanelHandler {
 
         addListeners(h1);
         addListeners(h2);
+
+        morphHandles = h1.getHandles();
+        border = h1.getBorderList();
+
+        JButton preview = new JButton("Preview");
+        preview.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        morphTriangles();
+                    }
+            }
+        );
+        this.add(preview);
+    }
+
+    public void setTweens(int t) {
+        tweens = t;
+        System.out.println(t);
+    }
+
+    public void setImage(BufferedImage img, int which) {
+        if(which == 1) {
+            h1.addImage(img);
+            h1.repaint();
+        }
+        else if(which == 2) {
+            h2.addImage(img);
+            h2.repaint();
+        }
+        else {
+            System.out.println("Error: this child doesn't exist");
+        }
+
     }
 
     private void addListeners(HandlePanel h) {
@@ -51,11 +92,260 @@ public class HandlePanelHandler {
         h2.colorHandle(i);
     }
 
+    Triangle[] tri;
+    int[] border;
+
+    public void morphTriangles() {
+
+        System.out.println("morphing");
+        //what do i need
+
+        //starting and ending sets of triangles
+        //ask child to return set of triangles?
+
+        //border = h1.getBorderList();
+
+        //Triangle[] startSet = h1.drawAllTriangles(null, true);
+        //Triangle[] endSet = h2.drawAllTriangles(null, true);
+
+
+
+        Rectangle[] startHandles = h1.getHandles();
+        Rectangle[] endHandles = h2.getHandles();
+        //morphHandles = h1.getHandles();
+        resetHandles();
+
+
+        //tri = startSet;
+
+
+        //when t = tweens, be at endHandles
+        //when t = 0, be at startHandles
+        //(position) = (tweens - t) (startHandles) + (t) (endHandles)
+        //(x, y) = (tweens - t) (startX, startY) + (t) (endX, endY)
+        //x = tweens*startX - startX*t + endX*t
+        //y = tweens*startY - startY*t + endX*t
+
+        int[] tempX = new int[startHandles.length];
+        int[] tempY = new int[startHandles.length];
+        Rectangle[] tempHandles = new Rectangle[startHandles.length];
+
+        morphHandles = new Rectangle[startHandles.length];
+
+        //for(int t = 0; t < tweens; t++) {
+        int t = tweens;
+            for(int i = 0; i < tempX.length; i++) {
+                int startX = (int)startHandles[i].getX();
+                int startY = (int)startHandles[i].getY();
+                int endX = (int)endHandles[i].getX();
+                int endY = (int)endHandles[i].getY();
+
+                //x = tweens*startX - startX*t + endX*t
+                tempX[i] = (tweens*startX) - (startX*t) + (endX*t);
+                //y = tweens*startY - startY*t + endX*t
+                tempY[i] = (tweens*startY) - (startY*t) + (endY*t);
+
+                morphHandles[i].setRect(tempX[i], tempY[i], HANDLE_SIZE, HANDLE_SIZE);
+            }
+            repaint();
+
+
+        /*
+        //TODO: combine the following into one loop?
+        int[] xDiff = new int[startHandles.length];
+        int[] yDiff = new int[startHandles.length];
+
+        for(int i = 0; i < xDiff.length; i++) {
+            xDiff[i] = (int)(h2.getHandles()[i].getX() - h1.getHandles()[i].getX());
+            yDiff[i] = (int)(h2.getHandles()[i].getY() - h1.getHandles()[i].getY());
+        }
+
+        /*
+        for(int i = 0; i < xDiff.length; i++) {
+            xDiff[i] = (int)(endHandles[i].getX() - startHandles[i].getX());
+            yDiff[i] = (int)(endHandles[i].getY() - startHandles[i].getY());
+        }
+
+         */
+
+        /*
+        int[] xInc = new int[xDiff.length];
+        int[] yInc = new int[yDiff.length];
+
+        for(int i = 0; i < xInc.length; i++) {
+            xInc[i] = xDiff[i]/tweens;
+            yInc[i] = yDiff[i]/tweens;
+        }
+
+        move(xDiff, yDiff);
+        */
+
+        /*
+        for(int i = 0; i < tweens; i++) {
+            move(xInc, yInc);
+        }
+
+         */
 
 
 
 
 
+        /*
+        int[] xInc = new int[xDiff.length];
+        int[] yInc = new int[yDiff.length];
+
+        for(int i = 0; i < xInc.length; i++) {
+            xInc[i] = xDiff[i] / tweens;
+            yInc[i] = yDiff[i] / tweens;
+        }
+
+        //morphHandles = startHandles;
+
+        for(int i = 0; i < tweens; i++) {
+            int originalX = (int)morphHandles[i].getX();
+            int originalY = (int)morphHandles[i].getY();
+
+            morphHandles[i].setRect(originalX+xInc[i], originalY+yInc[i], HANDLE_SIZE, HANDLE_SIZE);
+
+            repaint();
+        }
+
+         */
+
+        /*
+        for(int j = 0; j < tweens; j++) {
+            for(int i = 0; i < startHandles.length; i++) {
+                int[] xDiff =
+            }
+
+
+            for(int i = 0; i < tri.length; i++) {
+                int[] xs1 = startSet[i].getXs();
+                int[] ys1 = startSet[i].getYs();
+                int[] xs2 = endSet[i].getXs();
+                int[] ys2 = endSet[i].getYs();
+
+                int[] xdiff = new int[3];
+                int[] ydiff = new int[3];
+
+                for(int k = 0; k < 3; k++) {
+                    xdiff[k] = xs2[k] - xs1[k];
+                    ydiff[k] = ys2[k] - ys1[k];
+                }
+
+                int[] xinc = new int[3];
+                int[] yinc = new int[3];
+
+                for(int k = 0; k < 3; k++) {
+                    xinc[k] = xdiff[k]/tweens;
+                    yinc[k] = ydiff[k]/tweens;
+                }
+
+                int[] adjust = new int[6];
+                adjust[0] = xinc[0];
+                adjust[1] = yinc[0];
+                adjust[2] = xinc[1];
+                adjust[3] = yinc[1];
+                adjust[4] = xinc[2];
+                adjust[5] = yinc[2];
+
+                tri[i].adjustPoints(adjust);
+            }
+            repaint();
+            //TODO: pause
+        }
+
+         */
+    }
+
+    public void resetHandles() {
+        for(int i = 0; i < morphHandles.length; i++) {
+            morphHandles[i] = h1.getHandles()[i];
+        }
+    }
+
+    private void move(int[] xInc, int[] yInc) {
+        for(int i = 0; i < morphHandles.length; i++) {
+            int originalX = (int)morphHandles[i].getX();
+            int originalY = (int)morphHandles[i].getY();
+            morphHandles[i].setRect(originalX+(xInc[i]), originalY+(yInc[i]/2), HANDLE_SIZE, HANDLE_SIZE);
+        }
+        repaint();
+
+        try {
+            Thread.sleep(50);
+        }
+        catch(InterruptedException e) {
+            System.out.println("interrupted");
+        }
+    }
+
+    public Dimension getPreferredSize() {
+        return new Dimension(FULL_PANEL_SIZE, FULL_PANEL_SIZE);
+    }
+
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
+    }
+
+
+
+
+    public void paintComponent(Graphics g) {
+
+        super.paintComponent(g);
+
+
+        //g.drawLine(0, 100, 0, 100);
+
+
+        Graphics2D g2D = (Graphics2D) g;
+
+
+        //TODO: i think i'll need this in part 2
+        //g2D.drawImage(bim, 0, 0, this);
+
+        //TODO: make functions like these static?
+        h1.drawAllTriangles(g, false, morphHandles);
+
+        //tri =
+
+
+        for(int i = 0; i < morphHandles.length; i++) {
+            //TODO: fix double function stuff
+            if(h1.containsInt(border, i)) {
+                g2D.setColor(Color.BLUE);
+            }
+            else {
+                //if(i == selected) {
+                    g2D.setColor(Color.MAGENTA);
+                //}
+                //else {
+                    g2D.setColor(Color.BLACK);
+                //}
+            }
+            g2D.fill(morphHandles[i]);
+        }
+
+
+
+        if(tri != null) {
+            for(int i = 0; i < tri.length; i++) {
+                tri[i].draw(g);
+            }
+        }
+        /*
+        public boolean containsInt(int[] values, int toFind) {
+            for(int i = 0; i < values.length; i++) {
+                if(values[i] == toFind)
+                    return true;
+            }
+            return false;
+        }
+
+         */
+    }
 
 
 
@@ -89,8 +379,12 @@ public class HandlePanelHandler {
     //I would rather this be its own class, but I can't figure out how to do this without extending JPanel
     class HandlePanel extends JPanel{
         final int HANDLE_SIZE = 10;
-        final int FULL_PANEL_SIZE = 600;
+        final int FULL_PANEL_SIZE = 500;
         final int PANEL_SIZE = 500;
+
+
+        BufferedImage bim = null;
+        BufferedImage transbim;
 
         boolean showBorder = true;
 
@@ -100,21 +394,8 @@ public class HandlePanelHandler {
         int perimeterLength = gridSize + 2;
         int numPerimeter = gridSize * 4 + 4;
 
+        double unit = (PANEL_SIZE-HANDLE_SIZE) / (perimeterLength-1) + .75;
 
-
-
-
-        //0  1  2  3  4  5  6
-        //7  8  9  10 11 12 13
-        //14 15 16 17 18 19 20
-        //21 22 23 24 25 26 27
-        //28 29 30 31 32 33 34
-        //35 36 37 38 39 40 41
-        //42 43 44 45 46 47 48
-
-        //if i/rowLength == 0 or rowLength-1 then it's perimeter
-        //else
-        //if j == 0 or j == rowLength-1 then it's perimeter
 
 
 
@@ -130,24 +411,57 @@ public class HandlePanelHandler {
         Rectangle[] perimeter;
         Rectangle[] rectangles;
         int numTotal;
-        //5x5 (generalize) grid of control points (for each image) - correspondance via numbers?
-        //nx2 array (25x2) for start and end?
-        //25 parametric equations
-        //set of points on the border to allow triangles on outside?
 
-        //this function will take two HandlePanels
-        //public static void doMorph(HandlePanel h1, HandlePanel h2) {
-        //return;
-        //}
+        public int[] getBorderList() {
+            return border;
+        }
+
+        public void addImage(BufferedImage bim) {
+            int width = bim.getWidth();
+            int height = bim.getHeight();
+            int length = 0;
+            int midpoint = 0;
+            int startX = 0;
+            int startY = 0;
+            int endX = 0;
+            int endY = 0;
+
+            if(width > height) {
+                length = height;
+                midpoint = length/2;
+                startX = midpoint - length/2;
+                startY = 0;
+                endX = midpoint + length/2;
+                endY = length;
+            }
+            else {
+                length = width;
+                midpoint = height/2;
+                startX = 0;
+                startY = midpoint - length/2;
+                endX = length;
+                endY = midpoint + length/2;
+            }
+
+            BufferedImage newbim = bim.getSubimage(startX, startY, length, length);
+
+
+
+            this.bim = newbim;
+            repaint();
+        }
+
+        protected Rectangle[] getHandles() {
+            return rectangles;
+        }
+
+        public void resetHandles() {
+            for(int i = 0; i < numTotal; i++)
+                rectangles[i].setRect((i%perimeterLength)*unit, (i/perimeterLength)*unit, HANDLE_SIZE, HANDLE_SIZE);
+            repaint();
+        }
 
         public HandlePanel() {
-            //TODO: generalize for rectangles, not just squares
-            //length between handles
-            int unit = PANEL_SIZE / perimeterLength;
-            //panelNumber = panel;
-            //this.panel1 = panel1;
-            //this.panel2 = panel2;
-
             handles = new Rectangle[numHandles];
             perimeter = new Rectangle[numPerimeter];
 
@@ -159,6 +473,9 @@ public class HandlePanelHandler {
             border = new int[numPerimeter];
             perimeterLength = numHandles + 2;
 
+
+            unit = (PANEL_SIZE-HANDLE_SIZE) / (perimeterLength-1) + .75;
+
             for(int i = 0; i < numTotal; i++) {
                 rectangles[i] = new Rectangle();
                 rectangles[i].setRect((i%perimeterLength)*unit, (i/perimeterLength)*unit, HANDLE_SIZE, HANDLE_SIZE);
@@ -166,44 +483,6 @@ public class HandlePanelHandler {
 
             int borderIdx = 0;
             int counter = 0;
-            /*
-            for(int i = 0; i < perimeterLength; i++) {
-                if(i == 0 || i == perimeterLength - 1) {
-                    if(borderIdx >= 24) {
-                        break;
-                    }
-                    border[borderIdx] = counter;
-                    //border.append(counter);
-                    borderIdx++;
-                    counter++;
-                }
-                else {
-                    for(int j = 0; j < perimeterLength; j++) {
-                        if(j == 0 || j == perimeterLength - 1) {
-                            if(borderIdx >= 24) {
-                                break;
-                            }
-                            border[borderIdx] = counter;
-                            borderIdx++;
-                            //border.append(counter);
-                        }
-                        counter++;
-                    }
-                }
-            }
-
-             */
-
-            //                        i / length(7) =
-            //0  1  2  3  4  5  6     0
-            //7  8  9  10 11 12 13    1
-            //14 15 16 17 18 19 20    2
-            //21 22 23 24 25 26 27    3
-            //28 29 30 31 32 33 34    4
-            //35 36 37 38 39 40 41    5
-            //42 43 44 45 46 47 48    6
-            //i % length(7) =
-            //0  1  2  3  4  5  6
 
             for(int i = 0; i < numTotal; i++) {
                 int row = i / perimeterLength;
@@ -218,77 +497,7 @@ public class HandlePanelHandler {
                     borderIdx++;
                 }
             }
-
-
-
-            /*
-            int count = 0;
-            for(int i = 0; i < perimeterLength; i++) {
-                if(i == 0 || i == perimeterLength-1) { //top or bottom row
-                    for(int j = 0; j < perimeterLength; j++) {
-                        perimeter[count] = new Rectangle();
-                        //x = j * unit
-                        perimeter[count].setRect(j*unit, i*unit, HANDLE_SIZE, HANDLE_SIZE);
-                        //y = i * unit
-
-                        count++;
-                    }
-                }
-                else { //middle rows
-                    for(int j = 0; j < 2; j++) {
-                        perimeter[count] = new Rectangle();
-                        //x = j * (perimeterLength-1) * unit
-                        //y = i * unit
-                        perimeter[count].setRect(j*(perimeterLength-1)*unit, i*unit, HANDLE_SIZE, HANDLE_SIZE);
-
-                        count++;
-                    }
-                }
-                //0  1  2  3  4  5  6 (i == 0)
-                //7                 8 (
-                //9                 10
-                //11                12
-                //13                14
-                //15                16
-                //17 18 19 20 21 22 23 (i == perimeterLength-1)
-            }
-
-            //TODO: generalize for rectangles
-            count = 0;
-            for(int i = 0; i < gridSize; i++) {
-                for(int j = 0; j < gridSize; j++) {
-                    handles[count] = new Rectangle();
-                    //x = (j+1) * unit
-
-                    //y = (i+1) * unit
-                    handles[count].setRect((j+1)*unit, (i+1)*unit, HANDLE_SIZE, HANDLE_SIZE);
-                    count++;
-                }
-            }
-
-             */
-
-
-            //initialize all handles
-            /*
-            for(int i = 0; i < numHandles; i++) {
-                handles[i] = new Rectangle();
-                //windowsize/gridSize * i - HANDLE_SIZE/2
-
-
-                handles[i].setRect(PANEL_SIZE/gridSize * (i/gridSize + 1) - HANDLE_SIZE/2,
-                        PANEL_SIZE/gridSize * (i%gridSize + 1) - HANDLE_SIZE/2,
-                        HANDLE_SIZE, HANDLE_SIZE);
-            }
-
-             */
-
-
             repaint();
-        }
-
-        public Component uhhh() {
-            return this.getParent();
         }
 
         public boolean containsInt(int[] values, int toFind) {
@@ -299,6 +508,8 @@ public class HandlePanelHandler {
             return false;
         }
 
+
+
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
 
@@ -308,7 +519,10 @@ public class HandlePanelHandler {
 
             Graphics2D g2D = (Graphics2D) g;
 
-            drawAllTriangles(g);
+
+            g2D.drawImage(bim, 0, 0, this);
+
+            drawAllTriangles(g, false, rectangles);
 
 
             for(int i = 0; i < numTotal; i++) {
@@ -325,122 +539,24 @@ public class HandlePanelHandler {
                 }
                 g2D.fill(rectangles[i]);
             }
-
-            /*
-            if(showBorder) {
-                for(int i = 0; i < numPerimeter; i++) {
-                    g2D.setColor(Color.BLUE);
-                    g2D.fill(perimeter[i]);
-                }
-            }
-
-            for(int i = 0; i < numHandles; i++) {
-                if(i == selected){
-                    g2D.setColor(Color.MAGENTA);
-                }
-                else {
-                    g2D.setColor(Color.BLACK);
-                }
-
-                g2D.fill(handles[i]);
-            }
-
-
-            //g.drawLine((int)handles[0].getX()+HANDLE_SIZE/2, (int)handles[0].getY()+HANDLE_SIZE/2,
-            //        (int)handles[1].getX()+HANDLE_SIZE/2, (int)handles[1].getY()+HANDLE_SIZE/2);
-
-            Triangle tri = new Triangle((int)handles[0].getX()+HANDLE_SIZE/2, (int)handles[0].getY()+HANDLE_SIZE/2,
-                    (int)handles[1].getX()+HANDLE_SIZE/2, (int)handles[1].getY()+HANDLE_SIZE/2,
-                    (int)handles[5].getX()+HANDLE_SIZE/2, (int)handles[5].getY()+HANDLE_SIZE/2);
-
-            tri.draw(g);
-
-             */
         }
-
-        private void drawUpperTriangles() {
-            //0  1  2  3  4  5  6
-            //7  0  1  2  3  4  8
-            //9  5  6  7  8  9  10
-            //11 10 11 12 13 14 12
-            //13 15 16 17 18 19 14
-            //15 20 21 22 23 24 16
-            //17 18 19 20 21 22 23
-
-            //just for perimeter
-
-            for(int i = 0; i < perimeterLength-1; i++) { //row num
-                //top row:
-                if(i == 0) {
-                    for(int j = 0; j < perimeterLength-1; j++) { //column num
-                        if(j == 0) { //point below will be in perimeter
-
-                        }
-                        else { //point below will be in handles
-
-                        }
-                    }
-                }
-                //bottom row: point below will be in handles
-                else if(i == perimeterLength-1) {
-
-                }
-
-
-                //inner rows
-                for(int j = 0; j < 2; j++) {
-
-                }
-
-            }
-
-
-
-
-            //within square
-            //0, 1, 5
-            //1, 2, 6
-            //2, 3, 7
-            //3, 4, 8
-            //from 0 to gridsize-1:
-            //
-
-            //0, 1, 5
-            //5, 6, 10
-            //10, 11, 15
-            //15, 16, 20
-            //from 0 to gridsize-1:
-            //
-
-            for(int i = 0; i < gridSize-1; i++) { //row
-                for(int j = 0; j < gridSize-1; j++) { //column
-                    //points in triangle:
-                    //j, j+1, i+1
-                }
-            }
-
-        }
-
-        private void drawLowerTriangles() {
-
-        }
-
-        //x x x x x
-        //x x x x x
-        //x x x x x
-        //x x x x x
-        //x x x x x
 
         //TODO: generalize for rectangles
-        private void drawAllTriangles(Graphics g) {
-            System.out.println(numTotal);
+        protected Triangle[] drawAllTriangles(Graphics g, boolean returnTri, Rectangle[] rectangles) {
+            Triangle[] triToReturn = new Triangle[numTotal];
+            int numTri = 0;
+
             for(int i = 0; i < numTotal; i++) {
                 int row = i / perimeterLength;
                 int col = i % perimeterLength;
 
                 if(row != perimeterLength-1 && col != perimeterLength-1) { //bottom row, no triangles below
-
-                    drawTriangle(i, i+1, i+perimeterLength, g);
+                    if(returnTri) {
+                        triToReturn[numTri] = drawTriangle(i, i+1, i+perimeterLength, g, false);
+                        numTri++;
+                    }
+                    else
+                        drawTriangle(i, i+1, i+perimeterLength, g, true);
                 }
                 else {
                     if(row == perimeterLength-1 && col != perimeterLength-1) {
@@ -461,9 +577,12 @@ public class HandlePanelHandler {
                     }
                 }
             }
+            if(returnTri)
+                return triToReturn;
+            return null;
         }
 
-        private void drawTriangle(int point1, int point2, int point3, Graphics g) {
+        private Triangle drawTriangle(int point1, int point2, int point3, Graphics g, boolean drawTri) {
             int x1 = (int)rectangles[point1].getX() + HANDLE_SIZE/2;
             int y1 = (int)rectangles[point1].getY() + HANDLE_SIZE/2;
 
@@ -474,7 +593,10 @@ public class HandlePanelHandler {
             int y3 = (int)rectangles[point3].getY() + HANDLE_SIZE/2;
 
             Triangle tri = new Triangle(x1, y1, x2, y2, x3, y3);
-            tri.draw(g);
+
+            if(drawTri)
+                tri.draw(g);
+            return tri;
         }
 
         public void colorHandle(int i) {
@@ -499,7 +621,6 @@ public class HandlePanelHandler {
                     if (rectangles[i].contains(x, y)) {
                         //highlight the relevant points
                         //set them as the ones being moved
-                        System.out.println("handle grabbed");
                         drag = i;
                         //selected = i;
                         selectHandle(i);
@@ -508,22 +629,6 @@ public class HandlePanelHandler {
                     }
                 }
             }
-
-            /*
-            for (int i = 0; i < numHandles; i++) {
-                if(handles[i].contains(x, y)) {
-                    //highlight the relevant points
-                    //set them as the ones being moved
-                    System.out.println("handle grabbed");
-                    drag = i;
-                    //selected = i;
-                    selectHandle(i);
-                    repaint();
-                    return;
-                }
-            }
-
-             */
         }
 
         //mousedrag:
@@ -545,7 +650,6 @@ public class HandlePanelHandler {
         //mouseend:
         //do nothing? idk
         public void mouseDone() {
-            System.out.println("done");
             drag = -1;
         }
     }
