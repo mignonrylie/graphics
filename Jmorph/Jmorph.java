@@ -25,6 +25,18 @@ public class Jmorph extends JFrame{
     private void openMorphWindow() {
         h.resetHandles();
         JFrame frame = new JFrame("Preview");
+
+
+        //TODO: fix overlap
+        JButton preview = new JButton("Preview");
+        preview.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        h.morphTriangles();
+                    }
+                }
+        );
+        frame.add(preview, BorderLayout.PAGE_END);
         //frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         //frame.addWindowListener(new WindowAdapter() {
         //    @Override
@@ -81,7 +93,7 @@ public class Jmorph extends JFrame{
                             BufferedImage image = null;
                             try {
                                 image = ImageIO.read(file);
-                            } catch (IOException e1){};
+                            } catch (IOException e1){}
 
                             h.setImage(image, 1);
                         }
