@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.awt.geom.*;
-import java.awt.image.*;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -32,7 +30,7 @@ public class Jmorph extends JFrame{
         preview.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        h.morphTriangles();
+                        h.doWarp();
                     }
                 }
         );
