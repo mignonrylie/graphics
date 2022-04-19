@@ -7,8 +7,11 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.imageio.*;
 
+
+
 public class Triangle extends JFrame {
     int[] xs, ys;
+    double[] xsDouble, ysDouble;
 
 
     public Triangle(int x1, int y1, int x2, int y2, int x3, int y3) {
@@ -20,6 +23,17 @@ public class Triangle extends JFrame {
         ys[0] = y1;
         ys[1] = y2;
         ys[2] = y3;
+    }
+
+    public Triangle(double x1, double y1, double x2, double y2, double x3, double y3) {
+        xsDouble = new double[3];
+        ysDouble = new double[3];
+        xsDouble[0] = x1;
+        xsDouble[1] = x2;
+        xsDouble[2] = x3;
+        ysDouble[0] = y1;
+        ysDouble[1] = y2;
+        ysDouble[2] = y3;
     }
 
 
@@ -36,8 +50,16 @@ public class Triangle extends JFrame {
         return xs;
     }
 
+    public double[] getXsDouble() {
+        return xsDouble;
+    }
+
     public int[] getYs() {
         return ys;
+    }
+
+    public double[] getYsDouble() {
+        return ysDouble;
     }
 
     public void draw(Graphics g) {
