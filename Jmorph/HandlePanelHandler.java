@@ -27,6 +27,7 @@ import Jama.*;
 //TODO: get rid of unused variables
 //TODO: rename functions for clarity
 //TODO: find a way to combine triangle functions
+//TODO: make this run faster wtf. optimize to only update triangles that were moved?
 
 
 
@@ -37,6 +38,7 @@ public class HandlePanelHandler extends JPanel{
     BufferedImage startImg;
     BufferedImage endImg;
     BufferedImage morphImg;
+    BufferedImage morphImg2;
 
     int[] border;
     float alpha = 0;
@@ -110,6 +112,7 @@ public class HandlePanelHandler extends JPanel{
     }
 
     public void setImage(BufferedImage img, int which) {
+        //TODO: crop/scale
         if(which == 1) {
             morphImg = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
             morphImg = img;
@@ -118,6 +121,9 @@ public class HandlePanelHandler extends JPanel{
             h1.repaint();
         }
         else if(which == 2) {
+            morphImg2 = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+            morphImg2 = img;
+
             h2.addImage(img);
             h2.repaint();
         }
@@ -212,6 +218,7 @@ public class HandlePanelHandler extends JPanel{
     }
 
     public void iterate(int t) {
+        //TODO: alpha out of range
         alpha += 1/(double)tweens;
 
         //load beginning and end points
@@ -238,7 +245,8 @@ public class HandlePanelHandler extends JPanel{
             //update the in-between triangles
             generateAllTriangles();
             for(int j = 0; j < numTriangles; j++) {
-                morphOneTriangle(startHandles, endHandles, 0, 0, 0, startTriangles[j], triangles[j]);
+                morphOneTriangle(startTriangles[j], triangles[j], startImg, morphImg);
+                morphOneTriangle(triangles[j], startTriangles[j], endImg, morphImg2);
             }
         }
     }
@@ -252,8 +260,8 @@ public class HandlePanelHandler extends JPanel{
     }
 
 
-    public void morphOneTriangle(Rectangle[] startHandles, Rectangle[] endHandles, int tri1, int tri2, int tri3,
-                                 Triangle triangle1, Triangle triangle2) {
+    public void morphOneTriangle(Triangle triangle1, Triangle triangle2,
+                                 BufferedImage startImg, BufferedImage endImg) {
         //this code was taken from MorphTools.java
         double[] Sx = triangle1.getXsDouble();
         double[] Sy = triangle1.getYsDouble();
@@ -262,7 +270,7 @@ public class HandlePanelHandler extends JPanel{
 
         //TODO: change this and give credit
         //TODO: specify images maybe? that could be useful
-        alternateMatrix(Sx, Sy, Dx, Dy, startImg, morphImg);
+        alternateMatrix(Sx, Sy, Dx, Dy, startImg, endImg);
     }
 
     public void doWarp() {
@@ -270,6 +278,10 @@ public class HandlePanelHandler extends JPanel{
         //initialize the in-between image as a copy of the initial image
         morphImg = new BufferedImage(startImg.getWidth(), startImg.getHeight(), startImg.getType());
         morphImg = copyImage(startImg);
+
+        //needs to be initialized as second image with warp applied
+        morphImg2 = new BufferedImage(endImg.getWidth(), endImg.getHeight(), endImg.getType());
+        morphImg2 = copyImage(endImg);
 
         //setting up the timer between frames
         stop = false;
@@ -310,6 +322,9 @@ public class HandlePanelHandler extends JPanel{
 
         morphImg = new BufferedImage(startImg.getWidth(), startImg.getHeight(), startImg.getType());
         morphImg = copyImage(startImg);
+
+        morphImg2 = new BufferedImage(endImg.getWidth(), endImg.getHeight(), endImg.getType());
+        morphImg2 = copyImage(endImg);
     }
 
     public Dimension getPreferredSize() {
