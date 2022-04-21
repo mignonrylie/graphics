@@ -129,7 +129,7 @@ public class HandlePanelHandler extends JPanel{
             endImg = ImageIO.read(new File("cat2.jpeg"));
 
             morphImg2 = copyImage(endImg);
-            warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, 1);
+            //warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, 1);
 
             //set images within children
             BufferedImage tempStart = ImageIO.read(new File("cat1.jpeg"));
@@ -169,7 +169,7 @@ public class HandlePanelHandler extends JPanel{
             morphImg2 = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
             morphImg2 = img;
 
-            warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, 1);
+            //warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, 1);
 
 
             h2.addImage(img);
@@ -479,7 +479,7 @@ public class HandlePanelHandler extends JPanel{
         alpha = 0;
 
 
-        warpImage(endImg, morphImg2, h1.getHandles(), h2.getHandles(), morphHandles2, 1);
+        //warpImage(endImg, morphImg2, h1.getHandles(), h2.getHandles(), morphHandles2, 1);
 
 
         //need to take the original second image and apply the warp according to the first.
@@ -507,14 +507,13 @@ public class HandlePanelHandler extends JPanel{
 
                     warpImage(startImg, morphImg, h1.getHandles(), h2.getHandles(), morphHandles, count);
                     //TODO: do morph for second image from h1 to h2
-                    //warpImage(endImg, morphImg2, h1.getHandles(), h2.getHandles(), morphHandles2, tweens - count);
+                    warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, tweens - count);
                     repaint();
                     System.out.println(count);
 
                     alpha += (double)1/tweens;
 
-                    //TODO: debugging second image, remove later
-                    //alpha = 1;
+
 
 
                     warping = true;
@@ -542,6 +541,7 @@ public class HandlePanelHandler extends JPanel{
     }
 
     public void resetHandles() {
+        alpha = 0;
         HandlePanel h1Copy = new HandlePanel(h1);
         HandlePanel h2Copy = new HandlePanel(h2);
         //TODO: needs to be variable. add variable for length?
@@ -562,11 +562,11 @@ public class HandlePanelHandler extends JPanel{
 
         morphImg2 = new BufferedImage(endImg.getWidth(), endImg.getHeight(), endImg.getType());
         morphImg2 = copyImage(endImg);
-
-        warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, 1);
+        warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, tweens);
 
         //TODO: there is a better way to do this. separate functions?
         //iterate(tweens);
+        repaint();
     }
 
     public Dimension getPreferredSize() {
@@ -601,9 +601,9 @@ public class HandlePanelHandler extends JPanel{
 
         if(outputImages) {
             try {
-                String whichFrame = "";
+                String whichFrame = "0";
                 if(count > 10) {
-                    whichFrame = "0" + Integer.toString(count);
+                    whichFrame += Integer.toString(count);
                 }
                 else {
                     whichFrame = Integer.toString(count);
@@ -633,103 +633,9 @@ public class HandlePanelHandler extends JPanel{
         //alpha composite between first morph and second morph
     }
 
-
-    //this creates triangles for calculations
-    /*
-    private void generateAllTriangles() {
-        startTriangles = new Triangle[2*perimeterLength*perimeterLength];
-        triangles = new Triangle[2*perimeterLength*perimeterLength];
-        triangles2 = new Triangle[2*perimeterLength*perimeterLength];
-        destTriangles = new Triangle[2*perimeterLength*perimeterLength];
-        Rectangle[] startHandles = h1.getHandles();
-        Rectangle[] endHandles = h2.getHandles();
-        numTriangles = 0;
-
-        for(int i = 0; i < perimeterLength*perimeterLength; i++) {
-            int col = i % perimeterLength;
-            int row = i / perimeterLength;
-            if((col != perimeterLength-1) && (row != perimeterLength-1)) {
-                //upper
-                startTriangles[numTriangles] = new Triangle(
-                        startHandles[i].getX(),
-                        startHandles[i].getY(),
-                        startHandles[i+1].getX(),
-                        startHandles[i+1].getY(),
-                        startHandles[i+perimeterLength].getX(),
-                        startHandles[i+perimeterLength].getY()
-                );
-                triangles[numTriangles] = new Triangle(
-                        morphHandles[i].getX(),
-                        morphHandles[i].getY(),
-                        morphHandles[i+1].getX(),
-                        morphHandles[i+1].getY(),
-                        morphHandles[i+perimeterLength].getX(),
-                        morphHandles[i+perimeterLength].getY()
-                );
-                triangles2[numTriangles] = new Triangle(
-                        morphHandles2[i].getX(),
-                        morphHandles2[i].getY(),
-                        morphHandles2[i+1].getX(),
-                        morphHandles2[i+1].getY(),
-                        morphHandles2[i+perimeterLength].getX(),
-                        morphHandles2[i+perimeterLength].getY()
-                );
-                destTriangles[numTriangles] = new Triangle(
-                        endHandles[i].getX(),
-                        endHandles[i].getY(),
-                        endHandles[i+1].getX(),
-                        endHandles[i+1].getY(),
-                        endHandles[i+perimeterLength].getX(),
-                        endHandles[i+perimeterLength].getY()
-                );
-
-
-                numTriangles++;
-
-
-                //lower
-                startTriangles[numTriangles] = new Triangle(
-                        startHandles[i+1].getX(),
-                        startHandles[i+1].getY(),
-                        startHandles[i+perimeterLength].getX(),
-                        startHandles[i+perimeterLength].getY(),
-                        startHandles[i+perimeterLength+1].getX(),
-                        startHandles[i+perimeterLength+1].getY()
-                );
-                triangles[numTriangles] = new Triangle(
-                        morphHandles[i+1].getX(),
-                        morphHandles[i+1].getY(),
-                        morphHandles[i+perimeterLength].getX(),
-                        morphHandles[i+perimeterLength].getY(),
-                        morphHandles[i+perimeterLength+1].getX(),
-                        morphHandles[i+perimeterLength+1].getY()
-                );
-                triangles2[numTriangles] = new Triangle(
-                        morphHandles2[i+1].getX(),
-                        morphHandles2[i+1].getY(),
-                        morphHandles2[i+perimeterLength].getX(),
-                        morphHandles2[i+perimeterLength].getY(),
-                        morphHandles2[i+perimeterLength+1].getX(),
-                        morphHandles2[i+perimeterLength+1].getY()
-                );
-                destTriangles[numTriangles] = new Triangle(
-                        endHandles[i+1].getX(),
-                        endHandles[i+1].getY(),
-                        endHandles[i+perimeterLength].getX(),
-                        endHandles[i+perimeterLength].getY(),
-                        endHandles[i+perimeterLength+1].getX(),
-                        endHandles[i+perimeterLength+1].getY()
-                );
-
-                numTriangles++;
-            }
-        }
-    }
-
-     */
-
     //TODO: this is really stupid
     //TODO: change this method to just get every triangle for use in transformation
+    /*
     private void drawMyOwnTriangles(Graphics g) {
         triangles = new Triangle[2*perimeterLength*perimeterLength];
         Triangle[] triToReturn = new Triangle[morphHandles.length];
@@ -766,14 +672,20 @@ public class HandlePanelHandler extends JPanel{
         }
     }
 
+     */
+
     //TODO: this is bad practice
+    /*
     private void drawOneTriangle(Graphics g, int point1, int point2, int point3) {
         Triangle tri = createTriangle(point1, point2, point3);
         tri.draw(g);
     }
 
+     */
+
     //this creates a triangle for the purposes of drawing
     //TODO: is morphHandles2 needed here? I don't think so
+    /*
     private Triangle createTriangle(int point1, int point2, int point3) {
         int x1 = (int)morphHandles[point1].getX() + HANDLE_SIZE/2;
         int y1 = (int)morphHandles[point1].getY() + HANDLE_SIZE/2;
@@ -786,6 +698,8 @@ public class HandlePanelHandler extends JPanel{
 
         return new Triangle(x1, y1, x2, y2, x3, y3);
     }
+
+     */
 
 
 
