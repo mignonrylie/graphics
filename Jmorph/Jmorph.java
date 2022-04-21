@@ -57,9 +57,15 @@ public class Jmorph extends JFrame{
     //number of tweens
     //preview button (new window?)
     private void createLayout() {
+        //TODO: separate adding components into their own functions?
+
+        //TODO: rearrange this to be neater
+
         //frame = new JFrame();
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(new BorderLayout());
+
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         JMenuItem openFileStart = new JMenuItem("Open Start Image");
@@ -70,17 +76,23 @@ public class Jmorph extends JFrame{
         JPanel imagePanel1 = new JPanel();
         JPanel imagePanel2 = new JPanel();
         JPanel controlPanel = new JPanel();
+        JPanel gridSliderPanel = new JPanel();
+        gridSliderPanel.setLayout(new BorderLayout());
+        JPanel brightnessSliderPanel = new JPanel();
+        brightnessSliderPanel.setLayout(new BorderLayout());
+        JPanel buttonPanel = new JPanel();
 
         JButton reset = new JButton("Reset");
         JButton morph = new JButton("Preview Morph");
 
+        JSlider gridSize = new JSlider(5, 20);
+        JSlider brightnessSlider = new JSlider(-255, 255); //TODO: 0-1 or 0-100?
 
         //holder.setLayout(new BoxLayout(holder, BoxLayout.PAGE_AXIS));
-
         h = new HandlePanelHandler();
-
         tweens = new JSpinner(new SpinnerNumberModel(MAX_TWEEN/2, MIN_TWEEN, MAX_TWEEN, 1));
-        //JSlider gridSlider = new JSlider(1, 10);
+
+
 
         openFileStart.addActionListener(
                 new ActionListener() {
@@ -92,7 +104,6 @@ public class Jmorph extends JFrame{
                             try {
                                 image = ImageIO.read(file);
                             } catch (IOException e1){}
-
                             h.setImage(image, 1);
                         }
                     }
@@ -109,12 +120,17 @@ public class Jmorph extends JFrame{
                             try {
                                 image = ImageIO.read(file);
                             } catch (IOException e1){};
-
                             h.setImage(image, 2);
                         }
                     }
                 }
         );
+
+        fileMenu.add(openFileStart);
+        fileMenu.add(openFileEnd);
+        menuBar.add(fileMenu);
+        this.setJMenuBar(menuBar);
+
 
         tweens.addChangeListener(
                 new ChangeListener() {
@@ -125,8 +141,6 @@ public class Jmorph extends JFrame{
                         }
                         catch (java.text.ParseException err) {}
                         int tween = (int) spin.getValue();
-
-
                         h.setTweens(tween);
                     }
                 }
@@ -145,24 +159,57 @@ public class Jmorph extends JFrame{
         morph.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        //TODO: morph
                         openMorphWindow();
                     }
                 }
         );
 
-        fileMenu.add(openFileStart);
-        fileMenu.add(openFileEnd);
-        menuBar.add(fileMenu);
-        this.setJMenuBar(menuBar);
-        //TODO: reference this everywhere
+
+        gridSize.addChangeListener(
+                new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        JSlider source = (JSlider) e.getSource();
+                        int val = source.getValue();
+                        h.setGridSize(val);
+                    }
+                }
+        );
+        gridSize.setValue(5);
+
+        brightnessSlider.addChangeListener(
+                new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        JSlider source = (JSlider) e.getSource();
+                        int val = source.getValue();
+                        h.setBrightness(val);
+                    }
+                }
+        );
+        brightnessSlider.setValue(0);
 
 
-        controlPanel.add(reset);
-        controlPanel.add(tweens);
-        controlPanel.add(morph);
-        //frame.add(controlPanel);
-        //add(controlPanel);
+
+        buttonPanel.add(reset);
+        buttonPanel.add(tweens);
+        buttonPanel.add(morph);
+
+        JLabel sliderLabel = new JLabel("Grid Size", SwingConstants.CENTER);
+        gridSliderPanel.add(sliderLabel, BorderLayout.NORTH);
+        gridSliderPanel.add(gridSize, BorderLayout.SOUTH);
+        //TODO: add slider ticks?
+
+        JLabel brightnessLabel = new JLabel("Brightness", SwingConstants.CENTER);
+        brightnessSliderPanel.add(brightnessLabel, BorderLayout.NORTH);
+        brightnessSliderPanel.add(brightnessSlider, BorderLayout.SOUTH);
+
+        controlPanel.add(brightnessSliderPanel);
+        controlPanel.add(buttonPanel);
+        controlPanel.add(gridSliderPanel);
+        //controlPanel.add(reset);
+        //controlPanel.add(tweens);
+        //controlPanel.add(morph);
 
 
 
@@ -173,13 +220,15 @@ public class Jmorph extends JFrame{
         imagePanel2.add(h.getChild(2));
 
 
-        holder.add(imagePanel1, BorderLayout.LINE_START);
+        holder.add(imagePanel1);
         //holder.add(test, BorderLayout.CENTER);
-        holder.add(imagePanel2, BorderLayout.LINE_END);
+        holder.add(imagePanel2);
 
-        holder.add(controlPanel, BorderLayout.PAGE_END);
+        //holder.add(controlPanel);
 
-        this.add(holder);
+
+        this.add(holder, BorderLayout.NORTH);
+        this.add(controlPanel, BorderLayout.SOUTH);
         //add(imagePanel1);
         //add(imagePanel2);
         //add(h);
