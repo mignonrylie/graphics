@@ -3,7 +3,6 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.awt.geom.*;
 import java.io.*;
-import java.nio.Buffer;
 import javax.swing.*;
 import javax.imageio.*;
 
@@ -28,12 +27,9 @@ import Jama.*;
 //TODO: rename functions for clarity
 //TODO: find a way to combine triangle functions
 //TODO: make this run faster wtf. optimize to only update triangles that were moved?
-
-
-
-
-
 //TODO: check for calling child class when not necessary
+
+
 public class HandlePanelHandler extends JPanel{
     //debugging
     boolean doFade = false;
@@ -121,10 +117,19 @@ public class HandlePanelHandler extends JPanel{
         h1 = new HandlePanel();
         h2 = new HandlePanel();
 
+        //adds the mouselisteners to the children
+        addListeners(h1);
+        addListeners(h2);
+
+        setGridSize(h1.getGridSize());
+
         try {
             //save beginning and end images to parent class
             startImg = ImageIO.read(new File("cat1.jpeg"));
             endImg = ImageIO.read(new File("cat2.jpeg"));
+
+            morphImg2 = copyImage(endImg);
+            warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, 1);
 
             //set images within children
             BufferedImage tempStart = ImageIO.read(new File("cat1.jpeg"));
@@ -136,15 +141,12 @@ public class HandlePanelHandler extends JPanel{
             System.err.println("Image read exception");
         }
 
-        //adds the mouselisteners to the children
-        addListeners(h1);
-        addListeners(h2);
 
 
 
-        setGridSize(h1.getGridSize());
 
 
+        //resetHandles();
     }
 
     public void setImage(BufferedImage img, int which) {
@@ -166,6 +168,9 @@ public class HandlePanelHandler extends JPanel{
         else if(which == 2) {
             morphImg2 = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
             morphImg2 = img;
+
+            warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, 1);
+
 
             h2.addImage(img);
             h2.repaint();
@@ -303,58 +308,50 @@ public class HandlePanelHandler extends JPanel{
 
     private void warpImage(BufferedImage src, BufferedImage dest, Rectangle[] srcRect,
                            Rectangle[] destRect, Rectangle[] handles, int t) {
-        //for the second image
+        //for the second image:
         //take the second image's morphed point and put it where the first image's morphed point is
 
 
 
 
-
-        //load beginning and end points
-        Rectangle[] startHandles = h1.getHandles();
-        Rectangle[] endHandles = h2.getHandles();
-
         //to hold the calculated in-between
-        int[] tempX = new int[startHandles.length];
-        int[] tempY = new int[startHandles.length];
-        int[] tempX2 = new int[startHandles.length];
-        int[] tempY2 = new int[startHandles.length];
+        int[] tempX = new int[srcRect.length];
+        int[] tempY = new int[srcRect.length];
 
         for (int i = 0; i < tempX.length; i++) {
-            if(startHandles[i].getX() == endHandles[i].getX() &&
-                    startHandles[i].getY() == endHandles[i].getY()) continue;
+            if(srcRect[i].getX() == destRect[i].getX() &&
+                    srcRect[i].getY() == destRect[i].getY()) continue;
             System.out.println("comparing");
 
-            double startX =  startHandles[i].getX();
-            double startY =  startHandles[i].getY();
-            double endX = endHandles[i].getX();
-            double endY = endHandles[i].getY();
+            double startX = srcRect[i].getX();
+            double startY = srcRect[i].getY();
+            double endX = destRect[i].getX();
+            double endY = destRect[i].getY();
 
             //parametric equation to calculate in-between
             tempX[i] = (int)(startX + t * ((endX - startX) / tweens));
             tempY[i] = (int)(startY + t * ((endY - startY) / tweens));
 
-            tempX2[i] = (int)(endX + t * ((startX - endX) / tweens));
-            tempY2[i] = (int)(endY + t * ((startY - endY) / tweens));
-
             //updating the in-between handles
-            morphHandles[i].setRect(tempX[i], tempY[i], HANDLE_SIZE, HANDLE_SIZE);
-            morphHandles2[i].setRect(tempX2[i], tempY2[i], HANDLE_SIZE, HANDLE_SIZE);
+            handles[i].setRect(tempX[i], tempY[i], HANDLE_SIZE, HANDLE_SIZE);
 
             //update the in-between triangles
-            generateAllTriangles();
+            Triangle[] srcTriangles = new Triangle[numTriangles];
+            srcTriangles = generateCustomTriangles(srcTriangles, srcRect);
+
+            //TODO: rename triangles to morphTriangles1 or something
+            Triangle[] morphingTriangles = new Triangle[numTriangles];
+            morphingTriangles = generateCustomTriangles(morphingTriangles, handles);
 
             for(int j = 0; j < numTriangles; j++) {
                 //TODO: redundant?
-                if(sameSpot(startTriangles[j], triangles[j])) continue;
+                if(sameSpot(srcTriangles[j], morphingTriangles[j])) continue;
 
-                if(init) {
-                    morphOneTriangle(triangles[j], startTriangles[j], endImg, morphImg2);
-                }
-                else {
-                    morphOneTriangle(startTriangles[j], triangles[j], startImg, morphImg);
+
+                    morphOneTriangle(srcTriangles[j], morphingTriangles[j], src, dest);
+                    //reference image, then the one that you want to change
                     //trianglesUpdated++;
-                }
+
 
 
                 //TODO: morph second image?
@@ -366,6 +363,7 @@ public class HandlePanelHandler extends JPanel{
 
     }
 
+    /*
     public void iterate(int t) {
         //for the second image
         //take the second image's morphed point and put it where the first image's morphed point is
@@ -411,7 +409,10 @@ public class HandlePanelHandler extends JPanel{
             morphHandles2[i].setRect(tempX2[i], tempY2[i], HANDLE_SIZE, HANDLE_SIZE);
 
             //update the in-between triangles
-            generateAllTriangles();
+            startTriangles = generateCustomTriangles(startTriangles, startHandles);
+            //TODO: rename triangles to morphTriangles1 or something
+            triangles = generateCustomTriangles(triangles, morphHandles);
+            //generateAllTriangles();
             trianglesUpdated = 0;
 
             for(int j = 0; j < numTriangles; j++) {
@@ -434,6 +435,8 @@ public class HandlePanelHandler extends JPanel{
         }
         System.out.println(trianglesUpdated);
     }
+
+     */
 
     private boolean sameSpot(Triangle one, Triangle two) {
         //TODO: allow int interpretation?
@@ -476,6 +479,9 @@ public class HandlePanelHandler extends JPanel{
         alpha = 0;
 
 
+        warpImage(endImg, morphImg2, h1.getHandles(), h2.getHandles(), morphHandles2, 1);
+
+
         //need to take the original second image and apply the warp according to the first.
         //then go from that back to neutral?
 
@@ -497,9 +503,18 @@ public class HandlePanelHandler extends JPanel{
                 //continue updating until all frames have been drawn
                 if(count < tweens) {
                     count++;
-                    iterate(count);
+                    //iterate(count);
+
+                    warpImage(startImg, morphImg, h1.getHandles(), h2.getHandles(), morphHandles, count);
+                    //TODO: do morph for second image from h1 to h2
+                    //warpImage(endImg, morphImg2, h1.getHandles(), h2.getHandles(), morphHandles2, tweens - count);
                     repaint();
                     System.out.println(count);
+
+                    alpha += (double)1/tweens;
+
+                    //TODO: debugging second image, remove later
+                    //alpha = 1;
 
 
                     warping = true;
@@ -548,10 +563,10 @@ public class HandlePanelHandler extends JPanel{
         morphImg2 = new BufferedImage(endImg.getWidth(), endImg.getHeight(), endImg.getType());
         morphImg2 = copyImage(endImg);
 
+        warpImage(endImg, morphImg2, h2.getHandles(), h1.getHandles(), morphHandles2, 1);
+
         //TODO: there is a better way to do this. separate functions?
-        init = true;
-        iterate(tweens);
-        init = false;
+        //iterate(tweens);
     }
 
     public Dimension getPreferredSize() {
@@ -574,12 +589,11 @@ public class HandlePanelHandler extends JPanel{
 
         g2D.drawImage(morphImg, 0, 0, this);
 
-        if(doFade) {
-            AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)alpha);
-            g2D.setComposite(ac);
 
-            g2D.drawImage(endImg, 0, 0, this); //draw end image
-        }
+        AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)alpha);
+        g2D.setComposite(ac);
+        g2D.drawImage(morphImg2, 0, 0, this); //draw end image
+
 
 
 
@@ -609,38 +623,19 @@ public class HandlePanelHandler extends JPanel{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-
-        Graphics2D g2D = (Graphics2D) g;
         generateImage();
 
+        Graphics2D g2D = (Graphics2D) g;
         g2D.drawImage(finalImage, 0, 0, this);
 
         //image one should go from original to morph
         //image two should go from morph to original if i'm feeling ambitious
         //alpha composite between first morph and second morph
-
-
-        /*
-        g2D.drawImage(morphImg, 0, 0, this);
-
-        drawMyOwnTriangles(g);
-
-        for(int i = 0; i < morphHandles.length; i++) {
-            //TODO: make static function
-            if(h1.containsInt(border, i)) {
-                g2D.setColor(Color.BLUE);
-            }
-            else {
-                g2D.setColor(Color.BLACK);
-            }
-            g2D.fill(morphHandles[i]);
-        }
-
-         */
     }
 
 
     //this creates triangles for calculations
+    /*
     private void generateAllTriangles() {
         startTriangles = new Triangle[2*perimeterLength*perimeterLength];
         triangles = new Triangle[2*perimeterLength*perimeterLength];
@@ -730,6 +725,8 @@ public class HandlePanelHandler extends JPanel{
             }
         }
     }
+
+     */
 
     //TODO: this is really stupid
     //TODO: change this method to just get every triangle for use in transformation
